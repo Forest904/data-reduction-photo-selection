@@ -1,6 +1,6 @@
 # AGENT.md
 
-This project solves the Data Reduction Practical: given photo embeddings in `photos.csv` and historical query results in `queries.csv`, select which photos to keep under budget `B` while preserving query usefulness. Implement Methods A-D, run experiments, generate figures, and support an ACM-style report. `PRD.md` is the authoritative implementation spec; `README.md` is the broad overview.
+This project solves the Data Reduction Practical: given photo embeddings in `photos.csv` and historical query results in `queries.csv`, select which photos to keep under budget `B` while preserving query usefulness. Methods A-D, experiment scripts, figures, and the ACM-style report are implemented. `README.md` is the entrypoint overview, and the final report records the completed project rationale and results.
 
 ## Non-Negotiables
 
@@ -12,7 +12,7 @@ This project solves the Data Reduction Practical: given photo embeddings in `pho
 - Keep exact Method A and exact Method C restricted to tiny datasets with guardrails.
 - Tie-break deterministically, preferably by lower photo ID.
 - Save figures from result files; do not manually edit result data.
-- If docs conflict, follow `PRD.md`; update README only for entrypoint-level workflow changes.
+- If docs conflict, follow the implemented code, tests, saved experiment artifacts, and final report; update README for entrypoint-level workflow changes.
 
 ## Method Reminders
 

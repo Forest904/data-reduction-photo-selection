@@ -5,15 +5,15 @@ Course project for the Data Reduction Practical. The goal is to decide which pho
 Each photo is represented by an embedding vector in `photos.csv`. Historical searches are represented by `queries.csv`, where each row lists the photo IDs returned by one query.
 
 > Deadline: June 15, 2026  
-> Status: implementation, experiments, figures, and report draft completed through Milestone 5
+> Status: implementation, experiments, figures, and final report completed
 
 ## Project Docs
 
-- [PRD.md](PRD.md): requirements, method definitions, interfaces, experiment design, and acceptance criteria.
-- [Roadmap.md](Roadmap.md): milestone-by-milestone implementation record.
 - [AGENT.md](AGENT.md): compact guidance for future coding agents working in this repo.
 - [Data_Reduction_Lecture_Summary_and_Full_Assignment.md](Data_Reduction_Lecture_Summary_and_Full_Assignment.md): lecture summary and assignment transcription used as project source material.
 - [docs/report_draft.md](docs/report_draft.md): Markdown-first ACM report draft for transfer into Overleaf.
+- [docs/report/report.tex](docs/report/report.tex): polished ACM-style LaTeX report source.
+- [output/pdf/data_reduction_report.pdf](output/pdf/data_reduction_report.pdf): compiled final 10-page PDF report.
 - [docs/submission_email.md](docs/submission_email.md): final submission email draft with link placeholders.
 
 ## Methods
@@ -34,8 +34,6 @@ Method D is the original project proposal. It weights photos by query frequency 
 ```text
 data-reduction-photo-selection/
   README.md
-  PRD.md
-  Roadmap.md
   AGENT.md
   pyproject.toml
   uv.lock
@@ -58,7 +56,7 @@ data/
     queries.csv
 ```
 
-`photos.csv` contains one embedding vector per row. `queries.csv` contains one historical query result set per row. Photo ID normalization and validation rules are implemented in `src/data_reduction/data.py` and described in [PRD.md](PRD.md).
+`photos.csv` contains one embedding vector per row. `queries.csv` contains one historical query result set per row. Photo ID normalization and validation rules are implemented in `src/data_reduction/data.py` and summarized in this README and the final report.
 
 ## Clean Clone Instructions
 
@@ -113,7 +111,7 @@ Saved result CSVs and diagnostics live under `experiments/results/`. Generated r
 - `scalability.png`
 - `budget_sensitivity.png`
 
-Latest report evidence batches are recorded in [Roadmap.md](Roadmap.md). The local private dataset summary is 41,620 photos, 2,048 embedding dimensions, and 443 query rows.
+Latest report evidence batches are saved under `experiments/results/`, including synthetic smoke runs, small exact comparisons, scalability, budget sensitivity, Method D ablations, and exact-method infeasibility checks. The local private dataset summary is 41,620 photos, 2,048 embedding dimensions, and 443 query rows.
 
 ## Final Deliverables
 
