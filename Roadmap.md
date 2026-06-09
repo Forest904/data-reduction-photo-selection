@@ -54,38 +54,46 @@ Exit criteria:
 
 ## Milestone 2: Shared Math and Evaluation
 
+Status: complete as of 2026-06-09.
+
 Goal: build the common evaluation layer used by all methods.
 
-Implementation tasks:
+Completed implementation:
 
-- Implement cosine similarity with safe handling for zero vectors.
-- Implement Jaccard/precision-style query utility for Method B.
-- Implement cosine proxy utility for Methods A, C, and D.
-- Implement shared `SelectionResult`.
-- Add timing and peak-memory measurement helpers.
-- Add deterministic tie-breaking helpers.
-- Add result serialization to CSV/JSON-friendly structures.
-- Add a small config loader for YAML experiment files.
+- Added `src/data_reduction/similarity.py` with vectorized cosine similarity helpers.
+- Implemented safe cosine handling for zero vectors, including zero-vs-zero returning `0.0` without NaNs.
+- Added `src/data_reduction/utility.py` with Jaccard/precision utility, IndepDF scores, and cosine proxy utility.
+- Treat query rows as normalized ID sets in shared utility calculations.
+- Added `src/data_reduction/evaluation.py` with shared `SelectionResult`, status typing, timing and peak-memory measurement, deterministic tie-breaking helpers, and CSV/JSON-friendly serialization.
+- Added `src/data_reduction/config.py` with a lightweight YAML experiment config loader and basic top-level shape validation.
+- Exported the new public helpers from `src/data_reduction/__init__.py`.
+- Added hand-verifiable tests for similarity, utility, serialization, measurement helpers, tie-breaking, and config loading.
 
-Recommended commands:
+Implemented commands:
 
 ```bash
-uv run pytest tests/test_similarity.py tests/test_utility.py
+uv run pytest tests/test_similarity.py tests/test_utility.py tests/test_evaluation.py tests/test_config.py
+uv run pytest
 uv run ruff check .
 ```
 
 Artifacts:
 
-- Similarity module.
-- Utility module.
-- Evaluation/result schema module.
-- Unit tests with hand-verifiable expected values.
+- Similarity module at `src/data_reduction/similarity.py`.
+- Utility module at `src/data_reduction/utility.py`.
+- Evaluation/result schema module at `src/data_reduction/evaluation.py`.
+- Config loader at `src/data_reduction/config.py`.
+- Unit tests with hand-verifiable expected values in `tests/test_similarity.py`, `tests/test_utility.py`, `tests/test_evaluation.py`, and `tests/test_config.py`.
+
+Validation results:
+
+- `uv run pytest tests/test_similarity.py tests/test_utility.py tests/test_evaluation.py tests/test_config.py` passes with 20 tests.
+- `uv run pytest` passes with 31 tests.
+- `uv run ruff check .` passes.
 
 Exit criteria:
 
-- Cosine and Jaccard utilities match expected values on synthetic examples.
-- Utility calculation is independent of method implementation.
-- Result objects serialize cleanly for experiment output.
+- Complete.
 
 ## Milestone 3: Required Methods
 
