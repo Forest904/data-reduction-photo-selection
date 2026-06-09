@@ -2,42 +2,55 @@
 
 ## Milestone 1: Project Foundation
 
+Status: complete as of 2026-06-09.
+
 Goal: create a reproducible Python project skeleton and trustworthy data-loading layer.
 
-Implementation tasks:
+Completed implementation:
 
-- Add `pyproject.toml`, `.python-version`, and `uv.lock`.
-- Add a lightweight `Makefile` only if it reduces repeated command typing; otherwise prefer documented `uv run ...` commands.
-- Create package skeleton under `src/data_reduction/`.
-- Create `data/raw/`, `data/processed/`, `experiments/configs/`, `experiments/results/`, `experiments/figures/`, `scripts/`, and `tests/`.
-- Add `data/README.md` explaining where to place `photos.csv` and `queries.csv`.
-- Implement CSV loading for photos and queries.
-- Implement photo ID normalization with `id_base=auto|zero|one`.
-- Implement validation for ID bounds, empty queries, duplicate query IDs, missing values, unequal embedding dimensions, and zero vectors.
-- Add tiny synthetic fixtures for tests.
+- Added `pyproject.toml`, `.python-version`, and `uv.lock` for a Python 3.12.2 `uv` project.
+- Added dependencies: NumPy, pandas, SciPy, scikit-learn, Matplotlib, PyYAML; dev dependencies: pytest and Ruff.
+- Did not add a `Makefile`; Milestone 1 uses direct documented `uv run ...` commands.
+- Created package skeleton under `src/data_reduction/`.
+- Created `data/raw/`, `data/processed/`, `experiments/configs/`, `experiments/results/`, `experiments/figures/`, `scripts/`, and `tests/`.
+- Added `data/README.md` explaining where to place `photos.csv` and `queries.csv`.
+- Moved the private dataset into `data/raw/photos.csv` and `data/raw/queries.csv`.
+- Removed the extracted `datareduction_dataset/` folder after moving the CSVs.
+- Added `.gitignore` rules so private raw CSVs and extracted dataset folders are not committed.
+- Implemented CSV loading for headerless photo embeddings and variable-length query rows.
+- Implemented photo ID normalization with `id_base=auto|zero|one`.
+- Implemented validation for ID bounds, empty queries, duplicate query IDs, missing values, malformed or unequal embedding rows, non-numeric values, and zero vectors.
+- Added tiny synthetic fixtures and initial data-loading tests.
 
-Recommended commands:
+Implemented commands:
 
 ```bash
-uv init --package
-uv add numpy pandas scipy scikit-learn matplotlib pyyaml
-uv add --dev pytest ruff
+uv sync
 uv run python scripts/validate_data.py
 uv run pytest
+uv run ruff check .
 ```
 
 Artifacts:
 
-- Working package scaffold.
-- Data validation script.
-- Synthetic test fixtures.
-- Passing initial data tests.
+- Working package scaffold in `src/data_reduction/`.
+- Data validation script at `scripts/validate_data.py`.
+- Synthetic test fixtures under `tests/fixtures/`.
+- Passing initial data tests in `tests/test_data_loading.py`.
+- Tracked placeholders for data and experiment output directories.
+
+Validation results:
+
+- `uv sync` works.
+- `uv run python scripts/validate_data.py` succeeds on the local private dataset.
+- Local dataset summary: 41,620 photos, 2,048 embedding dimensions, 443 queries.
+- `id_base=auto` is ambiguous for the local dataset, so validation defaults to zero-based IDs and reports `id_base_auto_ambiguous`.
+- `uv run pytest` passes with 11 tests.
+- `uv run ruff check .` passes.
 
 Exit criteria:
 
-- `uv sync` works.
-- Dataset validation produces clear success or failure diagnostics.
-- Tests cover photo/query parsing and ID normalization.
+- Complete.
 
 ## Milestone 2: Shared Math and Evaluation
 

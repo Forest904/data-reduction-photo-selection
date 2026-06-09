@@ -209,6 +209,11 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Private assignment dataset
+data/raw/*.csv
+!data/raw/.gitkeep
+datareduction_dataset/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
