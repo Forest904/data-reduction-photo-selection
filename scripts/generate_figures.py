@@ -111,7 +111,7 @@ def _plot_metric_by_method(
             label=str(method),
         )
     axis.set_title(title)
-    axis.set_xlabel("Sampled photos")
+    axis.set_xlabel("Dataset size (photos)")
     axis.set_ylabel(ylabel)
     axis.grid(True, alpha=0.3)
     axis.legend()
@@ -148,10 +148,10 @@ def _plot_scalability(frame: pd.DataFrame, output_path: Path) -> None:
             label=str(method),
         )
     axes[0].set_title("Runtime Scaling")
-    axes[0].set_xlabel("Sampled photos")
+    axes[0].set_xlabel("Dataset size (photos)")
     axes[0].set_ylabel("Runtime seconds")
     axes[1].set_title("Memory Scaling")
-    axes[1].set_xlabel("Sampled photos")
+    axes[1].set_xlabel("Dataset size (photos)")
     axes[1].set_ylabel("Peak memory MB")
     for axis in axes:
         axis.grid(True, alpha=0.3)

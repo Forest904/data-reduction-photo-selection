@@ -218,38 +218,77 @@ Exit criteria:
 
 ## Milestone 5: Report and Submission
 
+Status: local packaging complete as of 2026-06-09; external Overleaf/GitHub sharing and final email send remain manual submission steps.
+
 Goal: package the project for grading.
 
-Implementation tasks:
+Completed implementation:
 
-- Write the ACM SIG proceedings-style report in Overleaf.
-- Describe Method D clearly, including objective, algorithm, expected strengths, and limitations.
-- Compare Methods A-D on utility, runtime, memory, scalability, and theoretical complexity.
-- Include experiment setup, dataset handling, hardware notes, and reproducibility instructions.
-- Add a compact limitations section explaining the historical-query proxy and exact-method scale limits.
-- Prepare final submission email.
+- Added `docs/report_draft.md` as a Markdown-first ACM-style report draft following the requested outline.
+- Included front matter with author name and matricola.
+- Added an approximately 150-word abstract.
+- Described the problem formalization using photo embeddings, historical query rows, budget `B`, cosine-proxy utility, and Jaccard/precision utility.
+- Described Methods A-D, including Method D's objective, greedy facility-location algorithm, expected strengths, limitations, and theoretical complexity.
+- Compared Methods A-D on utility, runtime, memory, scalability, and theoretical complexity.
+- Included experiment setup, dataset handling, hardware notes, result batch names, generated figure paths, and reproducibility commands.
+- Added a compact limitations discussion covering the historical-query proxy, embedding-similarity dependence, and exact-method scale limits.
+- Added `docs/submission_email.md` with the required recipients, subject, full name, matricola, and GitHub/Overleaf link placeholders.
+- Updated `README.md` to reflect the implemented repository state rather than the old scaffold state.
+- Added clean-clone instructions to `README.md`, including dependency sync, private dataset placement, validation, tests, linting, and figure regeneration.
+- Preserved `.gitignore` private-data exclusions for `data/raw/*.csv`.
+- Added polished ACM SIG proceedings-style LaTeX source at `docs/report/report.tex`.
+- Added BibTeX references at `docs/report/references.bib` for the practical assignment, the SIGMOD 2026 data-forgetting paper, and Shapley values.
+- Built the final 10-page PDF report at `output/pdf/data_reduction_report.pdf`.
+- Included all five generated experiment figures in the LaTeX report.
+- Updated generated figure x-axis wording from `Sampled photos` to `Dataset size (photos)` for clearer report terminology.
+- Regenerated the affected report figures after the label change.
+- Rendered the final PDF pages with Poppler `pdftoppm` and visually checked the output for clipping, table overflow, figure readability, references, and page count.
+- Rebuilt the PDF after a final source edit and confirmed it still compiles to 10 pages.
 
-Recommended commands:
+Implemented commands:
 
 ```bash
 uv run pytest
 uv run ruff check .
 uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures
+pdflatex report.tex
+bibtex report
+pdflatex report.tex
+pdflatex report.tex
+pdftoppm -png output/pdf/data_reduction_report.pdf ...
 ```
 
 Artifacts:
 
-- Final report.
+- Markdown report draft at `docs/report_draft.md`.
+- Submission email draft at `docs/submission_email.md`.
+- ACM LaTeX report source at `docs/report/report.tex`.
+- Report bibliography at `docs/report/references.bib`.
+- Final 10-page PDF report at `output/pdf/data_reduction_report.pdf`.
+- Updated repository README with clean-clone instructions.
+- Regenerated figure artifacts under `experiments/figures/`.
+- Final report source ready to transfer into the ACM SIG proceedings Overleaf template.
 - Final GitHub repository.
-- Final Overleaf project.
-- Submission email draft.
+- Final Overleaf project remains an external manual step after transferring the draft into Overleaf.
+
+Validation results:
+
+- `uv run pytest` passes with 61 tests.
+- `uv run ruff check .` passes.
+- `uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures` succeeds and rewrites all planned report figure PNGs.
+- Direct MiKTeX build with `pdflatex -> bibtex -> pdflatex -> pdflatex` succeeds.
+- `pdfinfo output/pdf/data_reduction_report.pdf` reports `Pages: 10`.
+- LaTeX log has no unresolved references, no unresolved citations, and no overfull hbox warnings after the final rebuild.
+- Visual PDF QA passed on rendered page images.
 
 Exit criteria:
 
-- Clean clone instructions are accurate.
+- Clean clone instructions are documented in `README.md`.
 - Tests and linting pass.
-- Report figures match generated artifacts.
-- Submission email includes full name, matricola, GitHub link, and Overleaf link.
+- Report figure paths match regenerated artifacts.
+- Final PDF is exactly 10 pages.
+- Submission email includes full name, matricola, GitHub link placeholder, and Overleaf link placeholder.
+- Before sending, replace `[GITHUB_LINK_PLACEHOLDER]` and `[OVERLEAF_LINK_PLACEHOLDER]`, create/share the Overleaf project, share GitHub with `velgias@gmail.com`, and send the email.
 
 ## Priority Rules
 
