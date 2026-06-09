@@ -22,6 +22,7 @@ from data_reduction.similarity import (
     cosine_similarity_matrix,
     cosine_similarity_to_selection,
 )
+from data_reduction.methods import MethodLimits, select_method
 from data_reduction.utility import (
     cosine_proxy_utility,
     indepdf_scores,
@@ -32,6 +33,7 @@ __all__ = [
     "DataValidationError",
     "LoadedQueries",
     "MeasuredResult",
+    "MethodLimits",
     "SelectionResult",
     "SelectionStatus",
     "ValidationIssue",
@@ -47,5 +49,6 @@ __all__ = [
     "load_queries_csv",
     "measure_peak_memory_and_time",
     "rank_descending_with_id_tiebreak",
+    "select_method",
     "validate_dataset",
 ]
