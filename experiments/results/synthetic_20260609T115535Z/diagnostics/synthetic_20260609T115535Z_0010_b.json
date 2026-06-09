@@ -1,0 +1,94 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": 0.9972527651380446,
+    "jaccard_precision_utility_eval": 0.42156862745098034
+  },
+  "experiment_id": "synthetic_20260609T115535Z_0010",
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "effective_budget": 3,
+      "score_summary": {
+        "max": 0.17647058823529413,
+        "mean": 0.08333333333333333,
+        "min": 0.0392156862745098,
+        "nonzero_count": 12
+      },
+      "selected_scores": {
+        "1": 0.14705882352941177,
+        "11": 0.17647058823529413,
+        "8": 0.0980392156862745
+      }
+    },
+    "diagnostics_path": null,
+    "message": "",
+    "method": "B",
+    "peak_memory_mb": 0.00829315185546875,
+    "runtime_seconds": 0.000984100013738498,
+    "selected_ids": [
+      11,
+      1,
+      8
+    ],
+    "status": "success",
+    "utility": 0.42156862745098034,
+    "utility_metric": "jaccard_precision_utility"
+  },
+  "sample": {
+    "dropped_query_count": 1,
+    "dropped_query_indexes": [
+      17
+    ],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 12,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      2,
+      5,
+      6,
+      7,
+      10,
+      11,
+      15,
+      18,
+      19,
+      21,
+      22
+    ],
+    "sampled_photo_count": 12,
+    "sampled_query_count": 17
+  },
+  "selected_original_ids": [
+    22,
+    2,
+    18
+  ],
+  "task": {
+    "budget": 3,
+    "method": "B",
+    "sample_size": 12,
+    "seed": 1
+  }
+}

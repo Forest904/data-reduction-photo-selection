@@ -1,0 +1,102 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": 0.998950893951449,
+    "jaccard_precision_utility_eval": 0.7083333333333334
+  },
+  "experiment_id": "synthetic_20260609T115535Z_0019",
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "candidate_scope": "all_photos",
+      "configured_candidate_chunk_size": 2048,
+      "coverage_cosine_transform": "max(0, cosine)",
+      "effective_budget": 3,
+      "effective_candidate_chunk_size": 2048,
+      "facility_objective": 0.998950893951449,
+      "marginal_gains": [
+        0.4163062836170456,
+        0.33264461033440346,
+        0.25
+      ],
+      "max_facility_similarity_mb": 64,
+      "numeric_dtype": "float64",
+      "selected_query_mass_weights": [
+        0.20833333333333334,
+        0.25,
+        0.25
+      ],
+      "stopped_reason": "budget_reached",
+      "weight_summary": {
+        "max": 0.25,
+        "mean": 0.16666666666666666,
+        "min": 0.041666666666666664,
+        "nonzero_count": 6
+      },
+      "weighted_target_count": 6
+    },
+    "diagnostics_path": null,
+    "message": "",
+    "method": "D",
+    "peak_memory_mb": 0.006733894348144531,
+    "runtime_seconds": 0.002148500003386289,
+    "selected_ids": [
+      5,
+      0,
+      1
+    ],
+    "status": "success",
+    "utility": 0.9989508939514491,
+    "utility_metric": "cosine_proxy_utility"
+  },
+  "sample": {
+    "dropped_query_count": 6,
+    "dropped_query_indexes": [
+      5,
+      6,
+      11,
+      15,
+      16,
+      17
+    ],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 6,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      5,
+      7,
+      10,
+      12,
+      16
+    ],
+    "sampled_photo_count": 6,
+    "sampled_query_count": 12
+  },
+  "selected_original_ids": [
+    16,
+    0,
+    5
+  ],
+  "task": {
+    "budget": 3,
+    "method": "D",
+    "sample_size": 6,
+    "seed": 0
+  }
+}

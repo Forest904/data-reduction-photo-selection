@@ -198,6 +198,20 @@ Validation results:
 - `uv run python scripts/run_experiments.py --config experiments/configs/exact_infeasibility.yaml --batch-id exact_infeasibility_local` succeeds and produced skipped rows for full-data exact Method A and exact Method C.
 - `uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures` regenerates all planned figure PNGs from saved results.
 
+Report evidence run:
+
+- Ran `make check` successfully: 61 tests passed and Ruff passed.
+- Ran `make exp-all` successfully to generate the assignment-report evidence batches.
+- Latest report evidence batches:
+  - `synthetic_20260609T115535Z`: 22 successful rows, 2 expected skipped rows.
+  - `small_exact_comparison_20260609T115600Z`: 48 successful rows covering Methods A-D.
+  - `scalability_20260609T115625Z`: 10 successful Method B/D scalability rows.
+  - `budget_sensitivity_20260609T115734Z`: 10 successful Method B/D budget rows.
+  - `d_ablations_20260609T115928Z`: 9 successful Method D ablation rows.
+  - `exact_infeasibility_20260609T120233Z`: 2 expected skipped rows for full-data exact Method A and Method C.
+- Regenerated `experiments/figures/utility.png`, `runtime.png`, `memory.png`, `scalability.png`, and `budget_sensitivity.png` from saved results.
+- Main interpretation for the report: Method D gives the strongest scalable cosine-proxy utility, Method B is the fastest and lightest scalable baseline, and exact Methods A/C are useful tiny-data references but infeasible on full data.
+
 Exit criteria:
 
 - Complete.
@@ -213,8 +227,6 @@ Implementation tasks:
 - Compare Methods A-D on utility, runtime, memory, scalability, and theoretical complexity.
 - Include experiment setup, dataset handling, hardware notes, and reproducibility instructions.
 - Add a compact limitations section explaining the historical-query proxy and exact-method scale limits.
-- Share GitHub with `velgias@gmail.com`.
-- Share Overleaf with `velgias@gmail.com` and `riccardo.torlone@uniroma3.it`.
 - Prepare final submission email.
 
 Recommended commands:

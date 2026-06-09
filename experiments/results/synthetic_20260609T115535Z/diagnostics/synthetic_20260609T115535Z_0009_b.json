@@ -1,0 +1,93 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": 0.6119135299458562,
+    "jaccard_precision_utility_eval": 0.3611111111111111
+  },
+  "experiment_id": "synthetic_20260609T115535Z_0009",
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "effective_budget": 3,
+      "score_summary": {
+        "max": 0.1388888888888889,
+        "mean": 0.08333333333333333,
+        "min": 0.018518518518518517,
+        "nonzero_count": 12
+      },
+      "selected_scores": {
+        "1": 0.1111111111111111,
+        "11": 0.1388888888888889,
+        "2": 0.1111111111111111
+      }
+    },
+    "diagnostics_path": null,
+    "message": "",
+    "method": "B",
+    "peak_memory_mb": 0.00829315185546875,
+    "runtime_seconds": 0.0012258999922778457,
+    "selected_ids": [
+      11,
+      1,
+      2
+    ],
+    "status": "success",
+    "utility": 0.3611111111111111,
+    "utility_metric": "jaccard_precision_utility"
+  },
+  "sample": {
+    "dropped_query_count": 0,
+    "dropped_query_indexes": [],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 12,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      7,
+      8,
+      11,
+      14,
+      17,
+      19,
+      21
+    ],
+    "sampled_photo_count": 12,
+    "sampled_query_count": 18
+  },
+  "selected_original_ids": [
+    21,
+    1,
+    3
+  ],
+  "task": {
+    "budget": 3,
+    "method": "B",
+    "sample_size": 12,
+    "seed": 0
+  }
+}

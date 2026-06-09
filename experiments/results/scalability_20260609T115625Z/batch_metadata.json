@@ -1,0 +1,30 @@
+{
+  "batch_id": "scalability_20260609T115625Z",
+  "config_path": "experiments\\configs\\scalability.yaml",
+  "config_sha256": "b40a09c8967224da979d59e8a71b07f9f81e6f16e00a00c4cdab6489db7f9596",
+  "cpu_count": 16,
+  "created_at_utc": "2026-06-09T11:56:25.971400+00:00",
+  "dataset_diagnostics": {
+    "dataset_kind": "raw",
+    "embedding_dimension": 2048,
+    "id_base_requested": "auto",
+    "id_base_resolved": "zero",
+    "id_normalization_diagnostics": [
+      {
+        "code": "id_base_auto_ambiguous",
+        "message": "Query IDs fit zero-based and one-based ranges; defaulted to zero.",
+        "row": null
+      }
+    ],
+    "photo_count": 41620,
+    "query_count": 443,
+    "validation_warnings": []
+  },
+  "experiment_name": "scalability",
+  "git_commit": "970c38d",
+  "git_dirty": true,
+  "hardware_notes": "Windows-11-10.0.26200-SP0; cpu_count=16",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "AMD64 Family 26 Model 96 Stepping 0, AuthenticAMD",
+  "python_version": "3.12.2"
+}
