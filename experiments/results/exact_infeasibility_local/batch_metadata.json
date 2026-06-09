@@ -1,0 +1,30 @@
+{
+  "batch_id": "exact_infeasibility_local",
+  "config_path": "experiments\\configs\\exact_infeasibility.yaml",
+  "config_sha256": "f58c6e094fe13e5c017a03dd02349195bd9d9fda68410675dad6edff9a711305",
+  "cpu_count": 16,
+  "created_at_utc": "2026-06-09T11:47:46.888448+00:00",
+  "dataset_diagnostics": {
+    "dataset_kind": "raw",
+    "embedding_dimension": 2048,
+    "id_base_requested": "auto",
+    "id_base_resolved": "zero",
+    "id_normalization_diagnostics": [
+      {
+        "code": "id_base_auto_ambiguous",
+        "message": "Query IDs fit zero-based and one-based ranges; defaulted to zero.",
+        "row": null
+      }
+    ],
+    "photo_count": 41620,
+    "query_count": 443,
+    "validation_warnings": []
+  },
+  "experiment_name": "exact_infeasibility",
+  "git_commit": "78b4d79",
+  "git_dirty": true,
+  "hardware_notes": "Windows-11-10.0.26200-SP0; cpu_count=16",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "AMD64 Family 26 Model 96 Stepping 0, AuthenticAMD",
+  "python_version": "3.12.2"
+}

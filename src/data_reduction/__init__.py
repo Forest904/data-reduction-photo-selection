@@ -18,6 +18,16 @@ from data_reduction.evaluation import (
     measure_peak_memory_and_time,
     rank_descending_with_id_tiebreak,
 )
+from data_reduction.experiments import (
+    ExperimentTask,
+    SampledDataset,
+    coerce_experiment_limits,
+    create_synthetic_dataset,
+    evaluate_selection_metrics,
+    expand_experiment_grid,
+    sample_dataset,
+    select_experiment_method,
+)
 from data_reduction.similarity import (
     cosine_similarity_matrix,
     cosine_similarity_to_selection,
@@ -31,17 +41,23 @@ from data_reduction.utility import (
 
 __all__ = [
     "DataValidationError",
+    "ExperimentTask",
     "LoadedQueries",
     "MeasuredResult",
     "MethodLimits",
+    "SampledDataset",
     "SelectionResult",
     "SelectionStatus",
     "ValidationIssue",
     "ValidationReport",
     "best_candidate_with_id_tiebreak",
+    "coerce_experiment_limits",
     "cosine_proxy_utility",
     "cosine_similarity_matrix",
     "cosine_similarity_to_selection",
+    "create_synthetic_dataset",
+    "evaluate_selection_metrics",
+    "expand_experiment_grid",
     "indepdf_scores",
     "jaccard_precision_utility",
     "load_experiment_config",
@@ -49,6 +65,8 @@ __all__ = [
     "load_queries_csv",
     "measure_peak_memory_and_time",
     "rank_descending_with_id_tiebreak",
+    "sample_dataset",
+    "select_experiment_method",
     "select_method",
     "validate_dataset",
 ]

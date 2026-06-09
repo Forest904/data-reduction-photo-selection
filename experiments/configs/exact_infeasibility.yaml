@@ -1,0 +1,20 @@
+experiment_name: exact_infeasibility
+dataset_kind: raw
+photos_path: data/raw/photos.csv
+queries_path: data/raw/queries.csv
+id_base: auto
+methods: [A, C]
+sample_sizes: [41620]
+budgets: [3]
+seeds: [0]
+sample_strategy: query_active
+include_full_dataset: true
+metrics:
+  - cosine_proxy_utility
+  - runtime_seconds
+  - peak_memory_mb
+limits:
+  max_exhaustive_photos: 25
+  max_exhaustive_combinations: 100000
+  max_shapley_photos: 12
+  max_shapley_coalitions: 4096

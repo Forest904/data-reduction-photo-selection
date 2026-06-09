@@ -10,7 +10,7 @@ Completed implementation:
 
 - Added `pyproject.toml`, `.python-version`, and `uv.lock` for a Python 3.12.2 `uv` project.
 - Added dependencies: NumPy, pandas, SciPy, scikit-learn, Matplotlib, PyYAML; dev dependencies: pytest and Ruff.
-- Did not add a `Makefile`; Milestone 1 uses direct documented `uv run ...` commands.
+- Did not add a `Makefile` during Milestone 1; a reproducibility wrapper was added later in Milestone 4.
 - Created package skeleton under `src/data_reduction/`.
 - Created `data/raw/`, `data/processed/`, `experiments/configs/`, `experiments/results/`, `experiments/figures/`, `scripts/`, and `tests/`.
 - Added `data/README.md` explaining where to place `photos.csv` and `queries.csv`.
@@ -97,78 +97,110 @@ Exit criteria:
 
 ## Milestone 3: Required Methods
 
+Status: complete as of 2026-06-09.
+
 Goal: implement Methods A-D behind one interface.
 
-Implementation tasks:
+Completed implementation:
 
-- Implement Method A exhaustive cosine search.
-- Implement Method B IndepDF scoring and top-`B` selection.
-- Implement Method C exact Shapley for tiny datasets.
-- Implement Method D query-aware greedy facility-location.
-- Add optional random and most-frequent baselines if time allows.
-- Add infeasibility guardrails for exhaustive and Shapley runs.
-- Add method-level tests for deterministic selection and budget validation.
-- Add a script to run one method from the command line.
+- Added `src/data_reduction/methods/` with a shared `select_method(...)` dispatcher and `MethodLimits`.
+- Implemented Method A exhaustive cosine-proxy subset search for tiny datasets.
+- Implemented Method B IndepDF scoring and top-`B` selection with deterministic lower-ID tie-breaking.
+- Implemented Method C exact Shapley-value ranking for tiny datasets using the cosine proxy value function.
+- Implemented Method D query-mass-weighted greedy facility location as the main proposed method.
+- Method D uses all photos as candidate representatives, clipped cosine coverage `max(0, cosine)`, query-mass weights, and float64 optimization math.
+- Added Method D memory-aware chunking with `max_facility_similarity_mb`, an effective chunk-size diagnostic, and chunked final cosine-proxy utility scoring.
+- Added infeasibility guardrails for Method A and Method C, returning clean skipped `SelectionResult` objects with diagnostics.
+- Added strict public validation for budgets and method limits, rejecting non-integer and boolean budgets/limits.
+- Added `scripts/run_method.py` to run one method from the command line.
+- Added CLI dataset diagnostics in stdout JSON and human-readable ID-base/warning diagnostics on stderr.
+- Added clean CLI error handling for method execution and limit validation failures.
+- Added method-level and CLI regression tests for deterministic selection, budget validation, exact-method skips, Method D memory chunking, Method D near-tie ordering, and dataset diagnostics.
+- Did not add optional random or most-frequent baselines; required Methods A-D took priority.
 
-Recommended commands:
+Implemented commands:
 
 ```bash
 uv run python scripts/run_method.py --method D --budget 3
 uv run pytest tests/test_methods.py
+uv run pytest
 uv run ruff check .
 ```
 
 Artifacts:
 
-- Method modules for A-D.
-- Single-method runner script.
-- Method tests.
+- Method package at `src/data_reduction/methods/`.
+- Public dispatcher and `MethodLimits` exported from `src/data_reduction/__init__.py`.
+- Single-method runner script at `scripts/run_method.py`.
+- Method and CLI tests in `tests/test_methods.py`.
+
+Validation results:
+
+- `uv run pytest tests/test_methods.py` passes with 24 tests.
+- `uv run pytest` passes with 55 tests.
+- `uv run ruff check .` passes.
+- `uv run python scripts/run_method.py --method D --budget 3` succeeds on the local private dataset.
+- Local Method D run selected normalized photo IDs `11708, 24228, 25519`.
+- Local Method D cosine-proxy utility: `0.34930597816451886`.
+- Local Method D diagnostics include `id_base_auto_ambiguous`, `weighted_target_count=10937`, `effective_candidate_chunk_size=766`, `max_facility_similarity_mb=64`, and `numeric_dtype=float64`.
+- Exact Method A and exact Method C are guarded for infeasible runs by candidate/photo and coalition limits.
 
 Exit criteria:
 
-- Every method returns a valid `SelectionResult`.
-- Selected IDs are unique and within bounds.
-- Selected count never exceeds `budget`.
-- Method A and Method C skip cleanly when configured limits are exceeded.
-- Deterministic methods produce stable results across repeated runs.
+- Complete.
 
 ## Milestone 4: Experiments
 
+Status: complete as of 2026-06-09.
+
 Goal: generate the evidence needed for the report.
 
-Implementation tasks:
+Completed implementation:
 
-- Create experiment configs for synthetic, assignment-literal exact, scalability, budget sensitivity, and stretch ablations.
-- Implement `scripts/run_experiments.py`.
-- Save each run as one tidy result row.
-- Save method-specific diagnostics as JSON artifacts when needed.
-- Implement `scripts/generate_figures.py`.
-- Run exact 3-photo comparison on feasible sampled data.
-- Run larger comparisons for Method B and Method D.
-- Run Method D ablations and extra baselines if schedule allows.
-- Record Python version, git commit hash, config path, and hardware notes with each experiment batch.
+- Added `src/data_reduction/experiments.py` with deterministic query-active sampling, query projection/remapping, experiment grid expansion, synthetic clustered data generation, cross-method metric evaluation, and experiment-only Method D ablation aliases.
+- Added `scripts/run_experiments.py` for YAML-driven experiment batches.
+- Added `scripts/generate_figures.py` for reproducible Matplotlib figures generated from saved result CSV files.
+- Added experiment configs for synthetic sanity checks, small assignment-literal exact comparisons, scalability, budget sensitivity, Method D ablations, and full-data exact infeasibility documentation.
+- Saved each method/sample/budget/seed run as one tidy CSV row.
+- Saved per-run diagnostics JSON artifacts under each result batch's `diagnostics/` directory.
+- Saved batch metadata including Python version, git commit, git dirty flag, config path, config SHA-256 hash, platform/hardware notes, and dataset diagnostics.
+- Added cross-method evaluation columns for `cosine_proxy_utility_eval` and `jaccard_precision_utility_eval`.
+- Added Method D ablations for `D_frequency_only` and `D_coverage_only`; random, most-frequent, clustering, and Monte Carlo Shapley baselines remain out of scope.
+- Added regression tests for grid expansion, deterministic sampling/remapping, dropped-query diagnostics, experiment-only ablations, CLI result/diagnostics writing, figure generation, and oversized exact-infeasibility diagnostics.
+- Added a root `Makefile` with reproducibility targets for validation, tests, linting, core experiments, all experiment configs, figure generation, and experiment cleanup.
 
-Recommended commands:
+Implemented commands:
 
 ```bash
 uv run python scripts/run_experiments.py --config experiments/configs/small.yaml
-uv run python scripts/run_experiments.py --config experiments/configs/scalability.yaml
+uv run python scripts/run_experiments.py --config experiments/configs/exact_infeasibility.yaml --batch-id exact_infeasibility_local
 uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures
+uv run pytest
+uv run ruff check .
 ```
 
 Artifacts:
 
-- Experiment config files.
-- Result CSV files.
-- Diagnostics JSON files.
-- Figures for utility, runtime, memory, scalability, and budget sensitivity.
+- Experiment config files under `experiments/configs/`: `synthetic.yaml`, `small.yaml`, `scalability.yaml`, `budget_sensitivity.yaml`, `d_ablations.yaml`, and `exact_infeasibility.yaml`.
+- Experiment helper module at `src/data_reduction/experiments.py`.
+- Batch runner script at `scripts/run_experiments.py`.
+- Figure generation script at `scripts/generate_figures.py`.
+- Result CSV files and diagnostics JSON artifacts under `experiments/results/`.
+- Generated figures under `experiments/figures/`: utility, runtime, memory, scalability, and budget sensitivity.
+- Experiment tests in `tests/test_experiments.py`.
+- Root `Makefile` for reproducible command shortcuts.
+
+Validation results:
+
+- `uv run pytest` passes with 61 tests.
+- `uv run ruff check .` passes.
+- `uv run python scripts/run_experiments.py --config experiments/configs/small.yaml` succeeds and produced 48 successful rows covering Methods A-D.
+- `uv run python scripts/run_experiments.py --config experiments/configs/exact_infeasibility.yaml --batch-id exact_infeasibility_local` succeeds and produced skipped rows for full-data exact Method A and exact Method C.
+- `uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures` regenerates all planned figure PNGs from saved results.
 
 Exit criteria:
 
-- Required Methods A-D appear in the core comparison.
-- Exact Method A and exact Method C are either successfully run on tiny data or skipped with documented infeasibility diagnostics.
-- Figures are reproducible from saved results.
-- Results support a clear complexity-vs-measurement discussion.
+- Complete.
 
 ## Milestone 5: Report and Submission
 

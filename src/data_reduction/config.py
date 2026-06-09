@@ -14,7 +14,7 @@ _SEQUENCE_FIELDS = {
     "seeds",
     "metrics",
 }
-_MAPPING_FIELDS = {"limits"}
+_MAPPING_FIELDS = {"limits", "synthetic"}
 
 
 def load_experiment_config(path: str | Path) -> dict[str, Any]:
@@ -41,6 +41,24 @@ def _validate_basic_shape(config: dict[str, Any]) -> None:
         raise ValueError("photos_path must be a string when provided")
     if "queries_path" in config and not isinstance(config["queries_path"], str):
         raise ValueError("queries_path must be a string when provided")
+    if "id_base" in config and config["id_base"] not in {"auto", "zero", "one"}:
+        raise ValueError("id_base must be one of: auto, zero, one")
+    if "dataset_kind" in config and not isinstance(config["dataset_kind"], str):
+        raise ValueError("dataset_kind must be a string when provided")
+    if "sample_strategy" in config and not isinstance(config["sample_strategy"], str):
+        raise ValueError("sample_strategy must be a string when provided")
+    if "hardware_notes" in config and not isinstance(config["hardware_notes"], str):
+        raise ValueError("hardware_notes must be a string when provided")
+    if "include_full_dataset" in config and not isinstance(
+        config["include_full_dataset"],
+        bool,
+    ):
+        raise ValueError("include_full_dataset must be a boolean when provided")
+    if "query_sample_size" in config and not isinstance(
+        config["query_sample_size"],
+        int,
+    ):
+        raise ValueError("query_sample_size must be an integer when provided")
 
     for field_name in _SEQUENCE_FIELDS:
         if field_name in config and not isinstance(config[field_name], list):
