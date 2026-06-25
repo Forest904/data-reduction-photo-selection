@@ -1,0 +1,109 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": 0.9984218434561278,
+    "jaccard_precision_utility_eval": 0.5625
+  },
+  "experiment_id": "synthetic_canonical_0020",
+  "query_split": {
+    "eval_query_count": 8,
+    "eval_query_indexes": [],
+    "evaluation_scope": "train",
+    "query_holdout_fraction": null,
+    "train_query_count": 8
+  },
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "candidate_scope": "all_photos",
+      "configured_candidate_chunk_size": 2048,
+      "coverage_cosine_transform": "max(0, cosine)",
+      "effective_budget": 3,
+      "effective_candidate_chunk_size": 2048,
+      "facility_objective": 0.9984218434561277,
+      "marginal_gains": [
+        0.6237294896820725,
+        0.2496923537740552,
+        0.125
+      ],
+      "max_facility_similarity_mb": 64,
+      "numeric_dtype": "float64",
+      "selected_query_mass_weights": [
+        0.3125,
+        0.125,
+        0.125
+      ],
+      "stopped_reason": "budget_reached",
+      "weight_summary": {
+        "max": 0.3125,
+        "mean": 0.16666666666666666,
+        "min": 0.125,
+        "nonzero_count": 6
+      },
+      "weighted_target_count": 6
+    },
+    "diagnostics_path": null,
+    "message": "",
+    "method": "D",
+    "peak_memory_mb": 0.0062103271484375,
+    "runtime_seconds": 0.000982999918051064,
+    "selected_ids": [
+      1,
+      2,
+      3
+    ],
+    "status": "success",
+    "utility": 0.9984218434561276,
+    "utility_metric": "cosine_proxy_utility"
+  },
+  "sample": {
+    "dropped_query_count": 10,
+    "dropped_query_indexes": [
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      13,
+      16
+    ],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      3,
+      9,
+      12,
+      14,
+      15,
+      17
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 6,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      3,
+      8,
+      10,
+      15,
+      20
+    ],
+    "sampled_photo_count": 6,
+    "sampled_query_count": 8
+  },
+  "selected_original_ids": [
+    3,
+    8,
+    10
+  ],
+  "task": {
+    "budget": 3,
+    "method": "D",
+    "sample_size": 6,
+    "seed": 1
+  }
+}

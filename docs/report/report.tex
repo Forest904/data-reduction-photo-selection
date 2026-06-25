@@ -1,19 +1,34 @@
-\documentclass[sigconf,nonacm]{acmart}
-
-\settopmatter{printacmref=false, printccs=false, printfolios=true}
-\renewcommand\footnotetextcopyrightpermission[1]{}
-\pagestyle{plain}
+\documentclass[11pt]{article}
 
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{makecell}
 \usepackage{enumitem}
-\usepackage{balance}
 \usepackage{microtype}
 \usepackage{subcaption}
 \usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[letterpaper,margin=1in,includefoot]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\newcommand{\Description}[1]{}
 
 \graphicspath{{../../experiments/figures/}}
+
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 
 \newcommand{\dataset}{\mathcal{D}}
 \newcommand{\retained}{\mathcal{D}'}
@@ -25,22 +40,40 @@
 \title{Query-Aware Photo Selection for Data Reduction}
 
 \author{Luca Foresti}
-\affiliation{%
-  \institution{Roma Tre University}
-  \city{Rome}
-  \country{Italy}
-}
-\email{luc.foresti@stud.uniroma3.it}
-\thanks{Matricola: 565562.}
+\date{June 25, 2026}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\pagenumbering{gobble}
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+  \vspace*{0.18\textheight}
+  {\LARGE\bfseries Query-Aware Photo Selection for Data Reduction\par}
+  \vspace{2.5cm}
+  {\large Author\par}
+  \vspace{0.25cm}
+  {\Large Luca Foresti\par}
+  \vspace{2.0cm}
+  {\large Report created\par}
+  \vspace{0.25cm}
+  {\Large June 25, 2026\par}
+  \vfill
+  {\large Roma Tre University\par}
+  \vspace{0.2cm}
+  {\large Matricola: 565562\par}
+\end{titlepage}
+
+\clearpage
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 \begin{abstract}
 Smartphone photo collections grow quickly, but storage and search quality impose practical limits on how many images can be retained. This project studies query-aware photo selection: given photo embeddings and a historical query log, select a budgeted subset that preserves the usefulness of past search results. I implement four methods required by the assignment: exhaustive cosine-based selection, IndepDF with Jaccard-style scoring, exact Shapley-value ranking, and a proposed query-frequency-weighted greedy facility-location method. The implementation includes shared loading, validation, utility, experiment, and plotting code. Experiments on a private dataset of 41,620 photos, 2,048-dimensional embeddings, and 443 query rows show the expected trade-off: exact methods are useful tiny-scale references but infeasible on the full collection, IndepDF is fastest and lightest, and Method D gives the strongest scalable cosine-proxy utility while using more runtime and memory. The repository provides reproducible configs, saved results, generated figures, tests, and lint checks.
 \end{abstract}
 
-\keywords{data reduction, query logs, photo selection, submodular coverage, facility location}
-
-\begin{document}
-\maketitle
+\noindent\textbf{Keywords:} data reduction, query logs, photo selection, submodular coverage, facility location
 
 \section{Introduction}
 
@@ -54,7 +87,7 @@ This work follows the assignment framing~\cite{velegrakis2026practical} and the 
 
 The practical assignment gives photo embeddings and a historical query log, but it does not provide the original query operators. This means that the implementation cannot literally re-run a search over a reduced collection. I interpret the query log as empirical evidence of the user's information needs. If a photo appeared often in historical results, deleting it or failing to keep a semantically close representative is more likely to hurt future perceived quality.
 
-This interpretation leads to two complementary notions of usefulness. The first is membership utility: a retained photo is useful if it was directly present in historical query answers. Method B follows this view. The second is replacement utility: a retained photo is useful if it can represent photos that appeared in historical answers under embedding similarity. Methods A, C, and D follow this view through cosine similarity. The report keeps these utility views separate and records both where useful, because collapsing them into one number would hide the fact that the methods optimize different signals.
+This interpretation leads to two complementary metrics: membership utility for direct historical presence, used by Method B, and replacement utility for embedding-similar representatives, used by Methods A, C, and D. The report keeps both metrics separate because the methods optimize different signals.
 
 \subsection{Repository Scope}
 
@@ -92,9 +125,9 @@ Only historical result identifiers are available. The original search functions 
   \label{eq:cosine-proxy}
 \end{equation}
 
-Method B also uses the assignment's Jaccard/precision-style query membership view through IndepDF scores. The experiment layer records both cosine-proxy utility and Jaccard/precision utility for cross-method comparison. This is important because the methods optimize slightly different proxies: Methods A, C, and D are embedding-aware, while Method B is primarily membership-frequency based.
+Method B uses query-membership IndepDF scores. Each query contributes one over its result length to each returned photo, and these per-query masses are averaged over the query log. The experiment layer records both cosine-proxy utility and Jaccard/precision utility for cross-method comparison. This is important because the methods optimize slightly different proxies: Methods A, C, and D are embedding-aware, while Method B is primarily membership-frequency based.
 
-The data-loading layer normalizes query photo identifiers once, validates bounds and malformed rows, deduplicates per-query IDs, and reports diagnostics. On the local private dataset, \texttt{id\_base=auto} is ambiguous because query IDs fit both zero-based and one-based ranges. The loader therefore defaults to zero-based IDs and records \texttt{id\_base\_auto\_ambiguous}; this decision is carried into every experiment metadata file.
+The data-loading layer normalizes query photo identifiers once, validates bounds and malformed rows, deduplicates per-query IDs, and reports diagnostics. The assignment defines a photo ID by its line in \texttt{photos.csv}; for example, ID 73 is the vector on line 73. The final raw-data experiments therefore use one-based query IDs explicitly. The loader still supports zero-based and automatic modes for tests and reuse, but the canonical result metadata records \texttt{id\_base\_requested=one} and \texttt{id\_base\_resolved=one}.
 
 \subsection{Data Contract}
 
@@ -106,13 +139,13 @@ The local validation result gives a useful sanity check on the private data: 41,
 
 \subsection{Utility Metrics}
 
-The primary cross-method metric in the report is cosine-proxy utility, because it reflects embedding-level replacement quality and is the objective optimized by Methods A, C, and D. Jaccard/precision utility is recorded as a secondary metric because it is aligned with IndepDF's query-membership view. The experimental result schema stores both metrics for every successful run, plus runtime, peak measured memory, selected normalized IDs, selected original IDs, status, message, diagnostics path, config path, Python version, hardware notes, and git metadata.
+The primary cross-method metric in the report is cosine-proxy utility, because it reflects embedding-level replacement quality and is the objective optimized by Methods A, C, and D. Jaccard/precision utility is recorded as a secondary metric because it is aligned with IndepDF's query-membership view. The experimental result schema stores both metrics for every successful run, plus runtime, peak measured memory, selected normalized IDs, selected original IDs, train and evaluation query counts, evaluation scope, status, message, diagnostics path, config path, Python version, hardware notes, and git metadata.
 
 There are two consequences of this design. First, a method can look good under one metric and less good under another. The frequency-only Method D ablation is the clearest example: it preserves historically frequent memberships but does not cover embedding space as well. Second, the report does not claim that cosine-proxy utility is the true user utility. It is a reproducible proxy that makes the assignment executable with the available files.
 
 \section{Methodology}
 
-All methods expose the same public selection interface and return a structured result containing selected IDs, utility, runtime, peak measured memory, status, message, and diagnostics. Budgets and exact-method limits are validated before execution. Deterministic lower-ID tie-breaking is used throughout so repeated runs with the same data and configuration are reproducible.
+All methods expose a shared selection interface returning selected IDs, utility, runtime, peak memory, status, message, and diagnostics. Budgets and exact-method limits are validated before execution. Deterministic lower-ID tie-breaking keeps repeated runs reproducible.
 
 \subsection{Shared Implementation Layer}
 
@@ -136,7 +169,7 @@ The exact-search implementation is intentionally conservative. It is not a produ
 
 \subsection{Method B: IndepDF Greedy Scoring}
 
-Method B implements IndepDF using the historical query log. For each photo $d$, the score is the empirical average of its normalized membership contribution:
+Method B implements the assignment's Jaccard/precision IndepDF-style independent score using the historical query log. For each photo $d$, the score is the empirical average of its normalized membership contribution:
 \begin{equation}
   \operatorname{score}(d)
   =
@@ -146,7 +179,7 @@ Method B implements IndepDF using the historical query log. For each photo $d$, 
   \right],
   \label{eq:indepdf}
 \end{equation}
-where $I_q(d)=1$ if $d$ appears in query result $q(\dataset)$ and $0$ otherwise. The method selects the top $\budget$ photos by score. This corresponds to the Jaccard-based simplification in the assignment and avoids expensive subset search.
+where $I_q(d)=1$ if $d$ appears in query result $q(\dataset)$ and $0$ otherwise. The method selects the top $\budget$ photos by score. This is the independent marginal score induced by the assignment's Jaccard/precision utility: adding photo $d$ contributes $1/|q(\dataset)|$ to a query exactly when $d$ was returned by that query. It is not a DepDF implementation and does not model dependencies between selected photos; it is the scalable independent baseline required for the Jaccard setting.
 
 Method B is very fast and memory efficient because it only counts query memberships and sorts scores. Its limitation is that it does not use embedding similarity, so it can favor historically frequent photos without explicitly rewarding coverage or diversity in embedding space.
 
@@ -164,7 +197,7 @@ Method C treats each photo as a player in a cooperative game and computes its ex
 \end{equation}
 The implementation selects the highest-valued photos, again with deterministic lower-ID tie-breaking.
 
-This method gives a principled game-theoretic notion of individual contribution~\cite{shapley1953value}. However, exact Shapley computation is exponential in the number of photos. The final evidence focuses on $\budget=3$ tiny sampled datasets. The assignment notes that $\budget=4$ can be tried with sufficient computational power, but this final project does not rely on a $\budget=4$ evidence run because exact Shapley is guarded and the completed report configurations emphasize feasible, reproducible $\budget=3$ comparisons.
+This method gives a principled game-theoretic notion of individual contribution~\cite{shapley1953value}. However, exact Shapley computation is exponential in the number of photos. The final evidence runs exact Method C on tiny sampled datasets for $\budget=3$ and $\budget=4$, which covers the assignment's required three-photo case and the optional four-photo case where feasible. Full-data Shapley remains guarded because the coalition count is far outside the intended computational regime.
 
 The Shapley implementation uses the same value function as Method A, so the two exact baselines are comparable. Method A searches directly for the best set; Method C estimates individual importance and then ranks photos. This distinction is visible in the experiments: Shapley values are principled, but ranking individual values is not guaranteed to recover the best size-$B$ set under interactions between photos.
 
@@ -180,7 +213,7 @@ Method D is the proposed strategy. It combines Method B's query awareness with M
 
 The algorithm starts with an empty selected set. At each step it maintains every weighted target photo's best current similarity to the selected set, evaluates candidate marginal gains, and adds the candidate with the largest gain. It stops when $\budget$ photos have been selected. Ties are broken by lower photo ID. The implementation uses \texttt{float64} math and memory-aware chunking through \texttt{max\_facility\_similarity\_mb}.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Method summary.}
   \label{tab:method-summary}
   \small
@@ -198,7 +231,7 @@ The algorithm starts with an empty selected set. At each step it maintains every
 
 Expected strengths of Method D are query awareness, embedding awareness, and diversity through diminishing returns: once a region is covered, near-duplicate candidates have smaller marginal gains. The limitations are also clear. The method depends on historical queries being a useful proxy for future queries, depends on embedding quality and cosine similarity, and is slower and heavier than IndepDF because it repeatedly evaluates similarity-based coverage.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Greedy Method D in implementation terms.}
   \label{tab:method-d-steps}
   \small
@@ -221,7 +254,7 @@ Because $F(S)$ is a monotone coverage-style objective when similarities are nonn
 
 The four methods occupy different points in the design space. Method A is exact for the set objective but combinatorial. Method B is independent and scalable. Method C is principled but exponential in exact form. Method D is greedy and polynomial, with cost dominated by repeated similarity computations.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Theoretical cost drivers. Let $m$ be candidate photos, $r$ total query memberships, $t$ positively weighted targets, $k$ selected budget, and $c$ Method D candidate chunk size.}
   \label{tab:complexity}
   \small
@@ -239,7 +272,7 @@ The four methods occupy different points in the design space. Method A is exact 
 
 For the full dataset, the exact search scale is prohibitive even at the smallest assignment budget. With $m=41{,}620$ and $k=3$, Method A would need to consider 12,014,997,156,340 subsets. With $k=4$, the number rises to 125,007,034,163,850,445 subsets. Exact Shapley is even less plausible because it requires considering coalitions over the candidate set. These figures justify the guardrails used in the code.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Full-data exact-method infeasibility evidence.}
   \label{tab:infeasibility}
   \small
@@ -248,7 +281,9 @@ For the full dataset, the exact search scale is prohibitive even at the smallest
     Method & Photos & Budget & Outcome \\
     \midrule
     A & 41,620 & 3 & skipped: exhaustive photo-count limit exceeded \\
+    A & 41,620 & 4 & skipped: exhaustive photo-count limit exceeded \\
     C & 41,620 & 3 & skipped: exact Shapley photo-count limit exceeded \\
+    C & 41,620 & 4 & skipped: exact Shapley photo-count limit exceeded \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -267,7 +302,7 @@ This separation keeps the project easy to grade. A reviewer can inspect method c
 
 Every experiment row uses the same high-level schema. The most important fields are summarized in Table~\ref{tab:schema}. Method-specific details are kept in diagnostics JSON files referenced by the CSV row. This avoids making the CSV too wide while preserving enough information to audit skipped exact runs and Method D chunking behavior.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Core experiment result fields.}
   \label{tab:schema}
   \small
@@ -278,6 +313,7 @@ Every experiment row uses the same high-level schema. The most important fields 
     experiment identifiers & batch, config, method, sample size, budget, seed \\
     quality metrics & cosine-proxy utility and Jaccard/precision utility \\
     performance metrics & runtime seconds and peak measured memory MB \\
+    evaluation split & train query count, evaluation query count, and evaluation scope \\
     selected IDs & normalized IDs and original IDs after sampling projection \\
     status fields & success, skipped, timeout, or error with message \\
     provenance & config path, git commit, dirty flag, Python, hardware notes \\
@@ -304,7 +340,7 @@ The root \texttt{Makefile} wraps these commands for convenience. The report stil
 
 \subsection{Full-Data Method D Output}
 
-The local full-data Method D run with budget 3 selected normalized photo IDs 11708, 24228, and 25519. Its cosine-proxy utility was 0.349306. These selected IDs are not claimed to be universal best photos; they are the result of the implemented objective, local dataset normalization, and configured chunking limit. The value is useful because it shows that the proposed method can run on the full private dataset and produce a concrete retained set under the smallest assignment budget.
+The local full-data Method D run with budget 3 selected internal normalized photo IDs 5974, 39809, and 24228, corresponding to assignment line IDs 5975, 39810, and 24229 after one-based normalization. Its cosine-proxy utility was 0.369236. These selected IDs are not claimed to be universal best photos; they are the result of the implemented objective, local dataset normalization, and configured chunking limit. The value is useful because it shows that the proposed method can run on the full private dataset and produce a concrete retained set under the smallest assignment budget.
 
 The full-data exact infeasibility batch complements this output. It demonstrates that the exact baselines do not merely run slowly; they are outside the intended computational regime. The final report therefore compares exact methods on small sampled settings and scalable methods on large settings. This split is a methodological choice, not an omission.
 
@@ -312,7 +348,7 @@ The full-data exact infeasibility batch complements this output. It demonstrates
 
 \subsection{Setup}
 
-The private dataset contains 41,620 photos, each represented by a 2,048-dimensional embedding vector, and 443 historical query rows. The raw CSV files are not committed to the repository. Experiment configs sample query-active subsets where needed and preserve deterministic seeds.
+The private dataset contains 41,620 photos, each represented by a 2,048-dimensional embedding vector, and 443 historical query rows. The raw CSV files are not committed to the repository. Canonical raw-data configs use one-based query IDs, matching the assignment's line-number convention. Experiment configs sample query-active subsets where needed and preserve deterministic seeds.
 
 The recorded hardware environment is Python 3.12.2 on Windows 11, with 16 CPUs and an AMD64 processor. Figure artifacts are generated from saved CSV results using:
 \begin{verbatim}
@@ -321,7 +357,7 @@ uv run python scripts/generate_figures.py \
   --output experiments/figures
 \end{verbatim}
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Final evidence batches used in the report.}
   \label{tab:batches}
   \small
@@ -330,16 +366,17 @@ uv run python scripts/generate_figures.py \
     Batch & Purpose & Rows \\
     \midrule
     Synthetic & sanity checks & 24 \\
-    Small exact comparison & Methods A--D at exact scale & 48 \\
+    Small exact comparison & Methods A--D at exact scale & 96 \\
     Scalability & Methods B/D over sample sizes & 10 \\
     Budget sensitivity & Methods B/D over budgets & 10 \\
     D ablations & combined vs. single-signal variants & 9 \\
-    Exact infeasibility & full-data A/C skip evidence & 2 \\
+    Query holdout & train/evaluate query split for B/D & 12 \\
+    Exact infeasibility & full-data A/C skip evidence & 4 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Experiment configurations.}
   \label{tab:configs}
   \small
@@ -348,10 +385,11 @@ uv run python scripts/generate_figures.py \
     Config & Methods & Main purpose \\
     \midrule
     \texttt{synthetic.yaml} & A--D & Sanity checks on generated clustered data \\
-    \texttt{small.yaml} & A--D & Exact-scale comparison with $\budget=3$ \\
+    \texttt{small.yaml} & A--D & Exact-scale comparison with $\budget=3,4$ \\
     \texttt{scalability.yaml} & B,D & Runtime and memory over 1k--41,620 photos \\
     \texttt{budget\_sensitivity.yaml} & B,D & Utility as $\budget$ grows from 1 to 25 \\
     \texttt{d\_ablations.yaml} & D variants & Separate frequency and coverage effects \\
+    \texttt{query\_holdout.yaml} & B,D & Held-out query robustness with 25\% holdout \\
     \texttt{exact\_infeasibility.yaml} & A,C & Document full-data exact skips \\
     \bottomrule
   \end{tabularx}
@@ -363,15 +401,15 @@ The main sampling strategy is query-active sampling. It samples from photos that
 
 Each batch follows the same flow. The runner loads and validates data, resolves ID normalization, samples the requested slice if needed, projects query rows, executes each configured method-budget-seed combination, evaluates cross-method metrics, and writes outputs. The batch metadata stores the config hash, platform, Python version, hardware notes, git commit, dirty flag, and data diagnostics. This makes the report figures traceable to concrete CSV rows rather than manual spreadsheet edits.
 
-The figure-generation script scans all saved \texttt{results.csv} files under \texttt{experiments/results}. It filters successful rows for quality and performance plots while leaving skipped rows available for infeasibility discussion. The final figures used here were regenerated after the report draft was created, so the image files match the saved experiment outputs.
+The figure-generation script scans saved \texttt{results.csv} files under \texttt{experiments/results}. When canonical batches are present, it filters plots to batch IDs ending in \texttt{\_canonical}; this prevents older exploratory batches from silently changing report figures. It filters successful rows for quality and performance plots while leaving skipped rows available for infeasibility discussion.
 
 \subsection{Performance}
 
-The measured runtimes match the theoretical expectations. Method B is the fastest scalable method because it uses direct counting and sorting. In the scalability batch, Method B averaged 0.017 seconds and 0.482 MB peak measured memory. Method D averaged 11.157 seconds and 305.160 MB because it computes repeated similarity coverage, but it remained feasible on the full dataset through chunking.
+The measured runtimes match the theoretical expectations. Method B is the fastest scalable method because it uses direct counting and sorting. In the scalability batch, Method B averaged 0.010 seconds and 0.482 MB peak measured memory. Method D averaged 7.290 seconds and 305.160 MB because it computes repeated similarity coverage, but it remained feasible on the full dataset through chunking.
 
 The small exact-comparison batch is useful for a different reason. It shows that the shared method interface and utility code produce coherent behavior when every method can run. Method C is slower than Method A in this setting because exact Shapley evaluates marginal contributions across coalitions rather than directly enumerating only size-$B$ subsets. Method D is almost as fast as Method B on tiny samples because the similarity chunks are small.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\columnwidth]{runtime.png}
   \caption{Runtime by method and dataset size. Exact methods grow quickly and are only run on tiny samples; Method B is fastest, while Method D pays for similarity coverage.}
@@ -379,7 +417,7 @@ The small exact-comparison batch is useful for a different reason. It shows that
   \label{fig:runtime}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\columnwidth]{memory.png}
   \caption{Peak measured memory by method. Method D uses more memory than IndepDF because it evaluates chunked similarity coverage.}
@@ -387,7 +425,7 @@ The small exact-comparison batch is useful for a different reason. It shows that
   \label{fig:memory}
 \end{figure}
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Average small exact-comparison performance.}
   \label{tab:small-performance}
   \small
@@ -395,25 +433,25 @@ The small exact-comparison batch is useful for a different reason. It shows that
     \toprule
     Method & Runtime (s) & Peak MB \\
     \midrule
-    A & 0.075913 & 0.189691 \\
-    B & 0.000605 & 0.008263 \\
-    C & 1.201798 & 0.373998 \\
-    D & 0.002293 & 0.440657 \\
+    A & 0.064875 & 0.197561 \\
+    B & 0.000342 & 0.008232 \\
+    C & 0.690467 & 0.340381 \\
+    D & 0.001367 & 0.440582 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{figure*}[t]
+\begin{figure}[!htbp]
   \centering
-  \includegraphics[width=0.92\textwidth]{scalability.png}
+  \includegraphics[width=\textwidth]{scalability.png}
   \caption{Scalability for Methods B and D across increasing query-active samples, including the full dataset. Method D remains feasible but is more expensive because its objective is embedding-coverage based.}
   \Description{Two-panel line chart showing runtime and memory scaling for Methods B and D.}
   \label{fig:scalability}
-\end{figure*}
+\end{figure}
 
-Full-data exact Method A and exact Method C were skipped by design. Method A exceeds exhaustive-search limits, and Method C exceeds exact Shapley limits. These skipped rows are evidence of scale limits, not implementation failures.
+Full-data exact Method A and exact Method C were skipped by design for budgets 3 and 4. Method A exceeds exhaustive-search limits, and Method C exceeds exact Shapley limits. These skipped rows are evidence of scale limits, not implementation failures.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Scalability batch rows for scalable methods.}
   \label{tab:scalability-rows}
   \small
@@ -421,51 +459,55 @@ Full-data exact Method A and exact Method C were skipped by design. Method A exc
     \toprule
     Method & Photos & Utility & Runtime (s) \\
     \midrule
-    B & 1,000 & 0.261 & 0.010 \\
-    B & 5,000 & 0.266 & 0.015 \\
-    B & 10,000 & 0.269 & 0.019 \\
-    B & 20,000 & 0.263 & 0.021 \\
-    B & 41,620 & 0.263 & 0.021 \\
-    D & 1,000 & 0.340 & 0.228 \\
-    D & 5,000 & 0.345 & 2.195 \\
-    D & 10,000 & 0.347 & 7.094 \\
-    D & 20,000 & 0.349 & 15.285 \\
-    D & 41,620 & 0.349 & 30.981 \\
+    B & 1,000 & 0.302 & 0.007 \\
+    B & 5,000 & 0.311 & 0.009 \\
+    B & 10,000 & 0.286 & 0.011 \\
+    B & 20,000 & 0.283 & 0.012 \\
+    B & 41,620 & 0.283 & 0.013 \\
+    D & 1,000 & 0.359 & 0.133 \\
+    D & 5,000 & 0.368 & 1.322 \\
+    D & 10,000 & 0.366 & 4.510 \\
+    D & 20,000 & 0.371 & 10.010 \\
+    D & 41,620 & 0.369 & 20.478 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \subsection{Quality}
 
-On the small exact comparison, Methods A and D were nearly tied under cosine-proxy utility, while Method B and Method C remained close. This is expected: the sampled candidate sets are small enough that exact search is meaningful, and Method D's greedy coverage often reaches the same representative structure.
+On the small exact comparison, Methods A and D were nearly tied under cosine-proxy utility for both $\budget=3$ and $\budget=4$, while Method B and Method C remained close. This is expected: the sampled candidate sets are small enough that exact search is meaningful, and Method D's greedy coverage often reaches the same representative structure.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Average small exact-comparison utility.}
   \label{tab:small-utility}
   \small
-  \begin{tabular}{@{}lrr@{}}
+  \begin{tabular}{@{}lrrr@{}}
     \toprule
-    Method & Cosine proxy & Jaccard/precision \\
+    Method & Budget & Cosine proxy & Jaccard/precision \\
     \midrule
-    A & 0.608461 & 0.466651 \\
-    B & 0.594386 & 0.466651 \\
-    C & 0.603341 & 0.466651 \\
-    D & 0.608343 & 0.466651 \\
+    A & 3 & 0.612920 & 0.466651 \\
+    B & 3 & 0.602152 & 0.466651 \\
+    C & 3 & 0.603742 & 0.466651 \\
+    D & 3 & 0.612436 & 0.466651 \\
+    A & 4 & 0.696715 & 0.570696 \\
+    B & 4 & 0.682184 & 0.570696 \\
+    C & 4 & 0.682327 & 0.570696 \\
+    D & 4 & 0.696319 & 0.570696 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\columnwidth]{utility.png}
-  \caption{Cosine-proxy utility by method and dataset size. Method D tracks the exact baseline on small samples and improves over Method B on scalable runs.}
-  \Description{Line chart of cosine-proxy utility by method and dataset size.}
+  \caption{Cosine-proxy utility by method. Method D tracks the exact baseline on small samples and improves over Method B on scalable runs.}
+  \Description{Two-panel line chart of cosine-proxy utility by exact-comparison budget and scalable dataset size.}
   \label{fig:utility}
 \end{figure}
 
-On larger scalable runs, Method D achieved stronger cosine-proxy utility than Method B. In the scalability batch, the mean utilities were 0.264267 for Method B and 0.345876 for Method D. In the budget-sensitivity batch, the means were 0.290302 and 0.367031, respectively.
+On larger scalable runs, Method D achieved stronger cosine-proxy utility than Method B. In the scalability batch, the mean utilities were 0.293034 for Method B and 0.366595 for Method D. In the budget-sensitivity batch, the means were 0.315245 and 0.391628, respectively.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\columnwidth]{budget_sensitivity.png}
   \caption{Budget sensitivity on a 10,000-photo query-active sample. Both scalable methods improve as the retention budget grows, with Method D preserving more embedding-level utility.}
@@ -473,9 +515,9 @@ On larger scalable runs, Method D achieved stronger cosine-proxy utility than Me
   \label{fig:budget}
 \end{figure}
 
-The Method D ablation batch supports the combined design. Full Method D averaged 0.396579 cosine-proxy utility, coverage-only averaged 0.389474, and frequency-only averaged 0.327567. Frequency-only had higher Jaccard/precision utility but lower embedding coverage, which is consistent with its popularity-only behavior.
+The Method D ablation batch supports the combined design. Full Method D averaged 0.422695 cosine-proxy utility, coverage-only averaged 0.421382, and frequency-only averaged 0.352703. Frequency-only had higher Jaccard/precision utility but lower embedding coverage, which is consistent with its popularity-only behavior.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Budget sensitivity rows on the 10,000-photo sample.}
   \label{tab:budget-rows}
   \small
@@ -483,21 +525,21 @@ The Method D ablation batch supports the combined design. Full Method D averaged
     \toprule
     Method & Budget & Utility & Runtime (s) \\
     \midrule
-    B & 1 & 0.182 & 0.019 \\
-    B & 3 & 0.269 & 0.022 \\
-    B & 5 & 0.287 & 0.018 \\
-    B & 10 & 0.335 & 0.024 \\
-    B & 25 & 0.379 & 0.020 \\
-    D & 1 & 0.276 & 2.675 \\
-    D & 3 & 0.347 & 7.305 \\
-    D & 5 & 0.369 & 11.774 \\
-    D & 10 & 0.400 & 23.018 \\
-    D & 25 & 0.444 & 56.646 \\
+    B & 1 & 0.219 & 0.011 \\
+    B & 3 & 0.286 & 0.011 \\
+    B & 5 & 0.299 & 0.011 \\
+    B & 10 & 0.341 & 0.011 \\
+    B & 25 & 0.431 & 0.012 \\
+    D & 1 & 0.294 & 1.712 \\
+    D & 3 & 0.366 & 4.535 \\
+    D & 5 & 0.396 & 7.600 \\
+    D & 10 & 0.431 & 15.124 \\
+    D & 25 & 0.472 & 37.721 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Method D ablation means.}
   \label{tab:ablations}
   \small
@@ -505,12 +547,40 @@ The Method D ablation batch supports the combined design. Full Method D averaged
     \toprule
     Variant & Cosine proxy & Jaccard/precision \\
     \midrule
-    D & 0.396579 & 0.003419 \\
-    Coverage-only & 0.389474 & 0.000907 \\
-    Frequency-only & 0.327567 & 0.026869 \\
+    D & 0.422695 & 0.004007 \\
+    Coverage-only & 0.421382 & 0.000976 \\
+    Frequency-only & 0.352703 & 0.026869 \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\columnwidth]{holdout_utility.png}
+  \caption{Held-out query utility for Methods B and D on a 10,000-photo query-active sample. Methods are trained on 75\% of projected query rows and evaluated on the remaining 25\%.}
+  \Description{Line chart of held-out cosine-proxy utility by budget for Methods B and D.}
+  \label{fig:holdout}
+\end{figure}
+
+\begin{table}[!htbp]
+  \caption{Query-holdout means over three seeds.}
+  \label{tab:holdout}
+  \small
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    Method & Budget & Held-out utility & Runtime (s) \\
+    \midrule
+    B & 3 & 0.251655 & 0.009 \\
+    B & 10 & 0.339812 & 0.009 \\
+    D & 3 & 0.370361 & 3.887 \\
+    D & 10 & 0.428558 & 12.766 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Held-Out Query Robustness}
+
+The query-holdout batch addresses whether the scalable methods merely fit the same query rows used for scoring. For each seed, the runner trains Method B or Method D on 75\% of the projected query rows and evaluates the selected photos on the remaining 25\%. Method D remains stronger under this split: averaged over budgets and seeds, held-out cosine-proxy utility is 0.399460 for Method D and 0.295733 for Method B. This does not prove chronological generalization, because the query log has no timestamps, but it is a useful robustness check against evaluating only on the training query rows.
 
 \subsection{Interpreting the Metrics}
 
@@ -524,9 +594,9 @@ The exact small-sample utility table also shows why no single baseline is enough
 
 The synthetic batch is not meant to replace the private assignment dataset. Its role is to make the behavior of the methods easier to reason about. Synthetic clustered data creates small embedding groups with known structure, so a coverage method should prefer representatives from useful clusters rather than arbitrary frequent IDs. In that setting, Method A and Method D both reached an average cosine-proxy utility of 0.997714, while Method B averaged 0.789133. This is consistent with the intended design: when the embedding geometry has clear clusters, greedy facility location can recover the same coverage pattern as exact search on feasible instances.
 
-Method C behaved differently on synthetic data: it averaged 0.371130 cosine-proxy utility and 0.458946 Jaccard/precision utility. This does not mean Shapley values are incorrect. It shows that exact individual contribution ranking can disagree with the best size-$B$ set under a coverage objective, especially when the selected set needs complementary representatives. This supports reporting Method C as a principled baseline rather than as the final scalable solution.
+On synthetic data, Method C averaged 0.371130 cosine-proxy utility. Its Jaccard/precision utility was 0.458946. This does not mean Shapley values are incorrect. It shows that exact individual contribution ranking can disagree with the best size-$B$ set under a coverage objective, especially when the selected set needs complementary representatives. This supports reporting Method C as a principled baseline rather than as the final scalable solution.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Synthetic sanity-check means.}
   \label{tab:synthetic}
   \small
@@ -534,19 +604,19 @@ Method C behaved differently on synthetic data: it averaged 0.371130 cosine-prox
     \toprule
     Method & Cosine proxy & Jaccard/precision & Runtime (s) \\
     \midrule
-    A & 0.997714 & 0.382376 & 0.784858 \\
-    B & 0.789133 & 0.426743 & 0.000921 \\
-    C & 0.371130 & 0.458946 & 2.258512 \\
-    D & 0.997714 & 0.382376 & 0.002725 \\
+    A & 0.997714 & 0.382376 & 0.444359 \\
+    B & 0.789133 & 0.426743 & 0.000519 \\
+    C & 0.371130 & 0.458946 & 1.360460 \\
+    D & 0.997714 & 0.382376 & 0.001392 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \subsection{Exact-Scale Interpretation}
 
-The small exact comparison is the most important bridge between correctness and scalability. It uses real data, query-active sampling, and $\budget=3$, while keeping the candidate sets small enough for Methods A and C. The result that Method D nearly matches Method A is encouraging because Method D is not explicitly enumerating all subsets. Instead, it uses the same coverage intuition in a greedy form.
+The small exact comparison is the most important bridge between correctness and scalability. It uses real data, query-active sampling, and $\budget \in \{3,4\}$, while keeping the candidate sets small enough for Methods A and C. The result that Method D nearly matches Method A is encouraging because Method D is not explicitly enumerating all subsets. Instead, it uses the same coverage intuition in a greedy form.
 
-The identical average Jaccard/precision values in Table~\ref{tab:small-utility} are also worth noting. On these tiny query-active samples, the selected sets often preserve similar membership fractions even when the cosine-proxy choices differ. This is one reason the report emphasizes cosine-proxy utility as the primary metric for distinguishing embedding-aware behavior. The membership metric is useful, but it can be too coarse when the budget is tiny and sampled queries overlap heavily.
+The identical average Jaccard/precision values within each budget in Table~\ref{tab:small-utility} are also worth noting. On these tiny query-active samples, the selected sets often preserve similar membership fractions even when the cosine-proxy choices differ. This is one reason the report emphasizes cosine-proxy utility as the primary metric for distinguishing embedding-aware behavior. The membership metric is useful, but it can be too coarse when the budget is tiny and sampled queries overlap heavily.
 
 \subsection{Why Method D Is the Main Proposal}
 
@@ -556,23 +626,23 @@ Method D is not chosen because it wins every metric. It is chosen because it bes
 
 The methods show a clear cost-quality trade-off. Exact methods are valuable for small correctness and comparison settings, but they do not scale to the full dataset. IndepDF is the best choice when speed and memory dominate. Method D is the best mobile-deployment candidate when the device can afford an offline selection step and the goal is to preserve embedding-level search quality.
 
-\begin{table*}[t]
+The main limitation is workload drift: future queries may differ from the historical queries used for weighting. Exact Methods A and C also cannot serve as full-data baselines because their complexity is too high. Finally, embedding-aware conclusions depend on cosine similarity being a meaningful replacement-quality proxy for the provided vectors.
+
+\begin{table}[!htbp]
   \caption{Overall comparison of Methods A--D.}
   \label{tab:comparison}
   \small
-  \begin{tabularx}{\textwidth}{@{}lXXXX@{}}
+  \begin{tabularx}{\textwidth}{@{}lYYYY@{}}
     \toprule
     Method & Utility behavior & Runtime/memory & Complexity & Scalability \\
     \midrule
-    A & Exact optimum under cosine proxy on tiny samples & Quickly becomes infeasible & $\mathcal{O}\!\left(\binom{m}{B}\cdot \mathrm{eval}\right)$ & Tiny only \\
-    B & Strong query-frequency baseline; weaker embedding coverage & Fastest and lightest & Linear in query memberships plus sorting & Full dataset \\
-    C & Principled individual contribution estimate & Exact version is expensive & Exponential coalition enumeration & Tiny only \\
-    D & Strongest scalable cosine-proxy utility & Slower and heavier than B & Polynomial greedy marginal-gain computation & Full dataset with chunking \\
+    A & Exact cosine optimum on tiny samples & Quickly infeasible & $\mathcal{O}\!\left(\binom{m}{B}\cdot \mathrm{eval}\right)$ & Tiny only \\
+    B & Query-frequency baseline; weak coverage & Fastest and lightest & Query memberships plus sorting & Full dataset \\
+    C & Individual contribution estimate & Exact version expensive & Exponential coalitions & Tiny only \\
+    D & Strongest scalable cosine utility & Slower and heavier than B & Greedy marginal gains & Full dataset with chunking \\
     \bottomrule
   \end{tabularx}
-\end{table*}
-
-The most important limitation is that the system uses historical query results as a proxy for future search utility. If future searches differ strongly from past searches, query-frequency weights can overfit old behavior. A second limitation is that exact Method A and exact Method C cannot be used as full-data baselines because their theoretical complexity is too high. Finally, all embedding-aware conclusions depend on cosine similarity over the provided vectors being a meaningful proxy for visual or semantic replacement quality.
+\end{table}
 
 \subsection{Mobile Deployment View}
 
@@ -598,9 +668,9 @@ A second extension is a clustering or medoid baseline. Such a method would ignor
 
 A third extension is user constraints. The current budget treats every photo as equal cost and equally deletable. A realistic mobile system would support hard constraints and weighted costs: never delete favorites, prefer recent photos, preserve at least one item per album, or account for different file sizes. Method D could incorporate such constraints by filtering candidates, adjusting costs, or using a knapsack-style greedy variant.
 
-Finally, future experiments could evaluate robustness under simulated workload drift. For example, the query log could be split chronologically if timestamps were available, training weights on earlier queries and evaluating utility on later queries. Without timestamps, one can still perform random query splits, but chronological drift would better match the real question: whether historical behavior predicts future search needs.
+Finally, future experiments could evaluate robustness under chronological workload drift. The current report adds a random query-holdout split, but timestamps would allow a stronger test: training weights on earlier queries and evaluating utility on later queries. Chronological drift would better match the real question of whether historical behavior predicts future search needs.
 
-\begin{table}[t]
+\begin{table}[!htbp]
   \caption{Possible extensions and expected benefit.}
   \label{tab:future}
   \small
@@ -611,7 +681,7 @@ Finally, future experiments could evaluate robustness under simulated workload d
     Monte Carlo Shapley & scalable approximation to Method C \\
     Clustering baseline & clearer visual-representativeness comparison \\
     User constraints & safer deletion recommendations for personal photos \\
-    Workload split evaluation & stronger test of historical-query generalization \\
+    Chronological drift evaluation & stronger test of historical-query generalization \\
     File-size costs & closer match to actual storage-pressure decisions \\
     \bottomrule
   \end{tabularx}
@@ -633,7 +703,7 @@ The project also includes a \texttt{Makefile} with check, full-experiment, and f
 
 \subsection{Quality Controls}
 
-The automated test suite covers CSV parsing, ID normalization, invalid data handling, cosine similarity, utility calculations, method determinism, budget validation, exact-method skips, Method D chunking, experiment grid expansion, diagnostics writing, and figure generation. The final local verification command reports 61 passing tests, and Ruff reports no lint violations. These checks are not a substitute for mathematical proof, but they reduce the risk of implementation errors in the data pipeline and method comparison.
+The automated test suite covers CSV parsing, ID normalization, invalid data handling, cosine similarity, utility calculations, method determinism, budget validation, exact-method skips, Method D chunking, experiment grid expansion, query-holdout evaluation, diagnostics writing, and figure generation. The final local verification command reports 62 passing tests, and Ruff reports no lint violations. These checks are not a substitute for mathematical proof, but they reduce the risk of implementation errors in the data pipeline and method comparison.
 
 \section{Conclusion}
 
@@ -641,7 +711,6 @@ This project implements and evaluates all required methods for query-aware photo
 
 Method D is not a universal deletion policy. It inherits the biases of the historical query log and the embedding representation. Nevertheless, within the assignment setting it provides a strong compromise: it is faithful to the workload, explicitly uses visual similarity, and can be run on the full local dataset with documented memory guardrails. That makes it the most appropriate strategy among the implemented methods for preparing a reduced photo collection while preserving expected query usefulness.
 
-\balance
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
 

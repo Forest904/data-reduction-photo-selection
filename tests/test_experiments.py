@@ -116,6 +116,9 @@ limits:
 
     assert len(rows) == 1
     assert rows[0]["status"] == "skipped"
+    assert rows[0]["train_query_count"] == "2"
+    assert rows[0]["eval_query_count"] == "2"
+    assert rows[0]["evaluation_scope"] == "train"
     assert rows[0]["git_commit"]
     assert rows[0]["python_version"]
     diagnostics_path = Path(rows[0]["diagnostics_path"])
@@ -124,6 +127,57 @@ limits:
         "max_exhaustive_photos_exceeded"
     )
     assert diagnostics["sample"]["sampled_original_photo_ids"] == [0, 1, 2]
+
+
+def test_run_experiments_can_evaluate_on_query_holdout(tmp_path: Path):
+    config_path = tmp_path / "holdout.yaml"
+    output_dir = tmp_path / "results"
+    config_path.write_text(
+        """
+experiment_name: holdout_test
+dataset_kind: raw
+photos_path: tests/fixtures/photos_valid.csv
+queries_path: tests/fixtures/queries_zero.csv
+id_base: zero
+methods: [B]
+sample_sizes: [3]
+budgets: [1]
+seeds: [0]
+query_holdout_fraction: 0.5
+""".strip(),
+        encoding="utf-8",
+    )
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "scripts/run_experiments.py",
+            "--config",
+            str(config_path),
+            "--output",
+            str(output_dir),
+            "--batch-id",
+            "holdout_batch",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    rows = list(
+        csv.DictReader(
+            (output_dir / "holdout_batch" / "results.csv").open(encoding="utf-8")
+        )
+    )
+    assert rows[0]["status"] == "success"
+    assert rows[0]["evaluation_scope"] == "holdout"
+    assert rows[0]["train_query_count"] == "1"
+    assert rows[0]["eval_query_count"] == "1"
+    diagnostics = json.loads(
+        Path(rows[0]["diagnostics_path"]).read_text(encoding="utf-8")
+    )
+    assert diagnostics["query_split"]["evaluation_scope"] == "holdout"
 
 
 def test_generate_figures_creates_expected_pngs(tmp_path: Path):
@@ -170,6 +224,7 @@ def test_generate_figures_creates_expected_pngs(tmp_path: Path):
         "memory.png",
         "scalability.png",
         "budget_sensitivity.png",
+        "holdout_utility.png",
     ):
         figure_path = output_dir / name
         assert figure_path.exists()

@@ -2,7 +2,7 @@ experiment_name: d_ablations
 dataset_kind: raw
 photos_path: data/raw/photos.csv
 queries_path: data/raw/queries.csv
-id_base: auto
+id_base: one
 methods: [D, D_frequency_only, D_coverage_only]
 sample_sizes: [10000]
 budgets: [3, 10, 25]

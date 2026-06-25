@@ -71,10 +71,16 @@ def _select_indepdf(
     scores = indepdf_scores(num_photos, queries)
     selected_ids = rank_descending_with_id_tiebreak(scores, limit=effective_budget)
     utility = jaccard_precision_utility(selected_ids, queries)
+    query_count = len(queries)
     return (
         selected_ids,
         float(utility),
         {
+            "score_formula": "mean_query_membership_mass",
+            "score_formula_detail": "each query contributes 1 / |q(D)| to each returned photo",
+            "query_count": query_count,
+            "nonzero_score_count": int(np.count_nonzero(scores)),
+            "tie_breaking": "descending score, then lower photo ID",
             "selected_scores": {
                 str(photo_id): float(scores[photo_id]) for photo_id in selected_ids
             },

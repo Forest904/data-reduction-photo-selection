@@ -13,11 +13,11 @@ EXPERIMENT_ARGS += --batch-id "$(BATCH_ID)"
 endif
 
 .PHONY: help sync validate-data test lint check run-method-d figures \
-	exp-small exp-scalability exp-budget exp-ablations \
+	exp-small exp-scalability exp-budget exp-ablations exp-query-holdout \
 	exp-exact-infeasibility exp-synthetic exp-core exp-all clean-experiments
 
 help:
-	@$(PYTHON) -c "lines=['Available targets:', '  sync                    Install/sync dependencies with uv', '  validate-data           Validate data/raw/photos.csv and data/raw/queries.csv', '  test                    Run pytest', '  lint                    Run Ruff checks', '  check                   Run tests and lint', '  run-method-d            Run Method D with budget 3 on the local dataset', '  exp-small               Run small exact comparison experiments', '  exp-scalability         Run B/D scalability experiments', '  exp-budget              Run budget sensitivity experiments', '  exp-ablations           Run Method D ablation experiments', '  exp-exact-infeasibility Run full-data exact infeasibility documentation', '  exp-synthetic           Run synthetic sanity experiments', '  exp-core                Run small, exact infeasibility, and figures', '  exp-all                 Run all experiment configs and figures', '  figures                 Regenerate figures from saved results', '  clean-experiments       Remove generated result folders and figure PNGs', '', 'Variables:', '  RESULTS=$(RESULTS)', '  FIGURES=$(FIGURES)', '  HARDWARE_NOTES=$(HARDWARE_NOTES)', '  BATCH_ID=$(BATCH_ID)']; print('\n'.join(lines))"
+	@$(PYTHON) -c "lines=['Available targets:', '  sync                    Install/sync dependencies with uv', '  validate-data           Validate data/raw/photos.csv and data/raw/queries.csv', '  test                    Run pytest', '  lint                    Run Ruff checks', '  check                   Run tests and lint', '  run-method-d            Run Method D with budget 3 on the local dataset', '  exp-small               Run small exact comparison experiments', '  exp-scalability         Run B/D scalability experiments', '  exp-budget              Run budget sensitivity experiments', '  exp-ablations           Run Method D ablation experiments', '  exp-query-holdout       Run held-out query robustness experiments', '  exp-exact-infeasibility Run full-data exact infeasibility documentation', '  exp-synthetic           Run synthetic sanity experiments', '  exp-core                Run small, exact infeasibility, and figures', '  exp-all                 Run all experiment configs and figures', '  figures                 Regenerate figures from saved results', '  clean-experiments       Remove generated result folders and figure PNGs', '', 'Variables:', '  RESULTS=$(RESULTS)', '  FIGURES=$(FIGURES)', '  HARDWARE_NOTES=$(HARDWARE_NOTES)', '  BATCH_ID=$(BATCH_ID)']; print('\n'.join(lines))"
 
 sync:
 	uv sync
@@ -48,6 +48,9 @@ exp-budget:
 exp-ablations:
 	$(PYTHON) scripts/run_experiments.py --config experiments/configs/d_ablations.yaml $(EXPERIMENT_ARGS)
 
+exp-query-holdout:
+	$(PYTHON) scripts/run_experiments.py --config experiments/configs/query_holdout.yaml $(EXPERIMENT_ARGS)
+
 exp-exact-infeasibility:
 	$(PYTHON) scripts/run_experiments.py --config experiments/configs/exact_infeasibility.yaml $(EXPERIMENT_ARGS)
 
@@ -56,7 +59,7 @@ exp-synthetic:
 
 exp-core: exp-small exp-exact-infeasibility figures
 
-exp-all: exp-synthetic exp-small exp-scalability exp-budget exp-ablations exp-exact-infeasibility figures
+exp-all: exp-synthetic exp-small exp-scalability exp-budget exp-ablations exp-query-holdout exp-exact-infeasibility figures
 
 figures:
 	$(PYTHON) scripts/generate_figures.py --results "$(RESULTS)" --output "$(FIGURES)"

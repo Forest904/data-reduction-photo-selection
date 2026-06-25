@@ -1,0 +1,98 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": null,
+    "jaccard_precision_utility_eval": null
+  },
+  "experiment_id": "synthetic_canonical_0017",
+  "query_split": {
+    "eval_query_count": 18,
+    "eval_query_indexes": [],
+    "evaluation_scope": "train",
+    "query_holdout_fraction": null,
+    "train_query_count": 18
+  },
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "coalition_count": 16777216,
+      "effective_budget": 3,
+      "max_shapley_coalitions": 4096,
+      "max_shapley_photos": 12,
+      "num_photos": 24,
+      "reason": "max_shapley_photos_exceeded"
+    },
+    "diagnostics_path": null,
+    "message": "exact Shapley skipped because photo count exceeds the configured limit",
+    "method": "C",
+    "peak_memory_mb": 0.0,
+    "runtime_seconds": 0.0,
+    "selected_ids": [],
+    "status": "skipped",
+    "utility": 0.0,
+    "utility_metric": "cosine_proxy_utility"
+  },
+  "sample": {
+    "dropped_query_count": 0,
+    "dropped_query_indexes": [],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 24,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "sampled_photo_count": 24,
+    "sampled_query_count": 18
+  },
+  "selected_original_ids": [],
+  "task": {
+    "budget": 3,
+    "method": "C",
+    "sample_size": 24,
+    "seed": 0
+  }
+}

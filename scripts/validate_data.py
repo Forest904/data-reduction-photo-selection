@@ -24,7 +24,7 @@ def main() -> int:
     parser.add_argument(
         "--id-base",
         choices=["auto", "zero", "one"],
-        default="auto",
+        default="one",
         help="Photo ID base used by queries.csv.",
     )
     args = parser.parse_args()

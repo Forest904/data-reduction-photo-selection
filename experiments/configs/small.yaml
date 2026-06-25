@@ -2,10 +2,10 @@ experiment_name: small_exact_comparison
 dataset_kind: raw
 photos_path: data/raw/photos.csv
 queries_path: data/raw/queries.csv
-id_base: auto
+id_base: one
 methods: [A, B, C, D]
 sample_sizes: [6, 8, 10, 12]
-budgets: [3]
+budgets: [3, 4]
 seeds: [0, 1, 2]
 sample_strategy: query_active
 metrics:

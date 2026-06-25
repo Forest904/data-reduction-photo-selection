@@ -79,6 +79,9 @@ def test_method_b_indepdf_tie_breaks_by_lower_photo_id():
     assert result.utility == pytest.approx(0.5)
     assert result.utility_metric == "jaccard_precision_utility"
     assert result.diagnostics["selected_scores"] == {"0": 0.25, "1": 0.25}
+    assert result.diagnostics["score_formula"] == "mean_query_membership_mass"
+    assert result.diagnostics["nonzero_score_count"] == 4
+    assert result.diagnostics["tie_breaking"] == "descending score, then lower photo ID"
 
 
 def test_method_c_exact_shapley_selects_centroid_representative():
@@ -243,7 +246,7 @@ def test_run_method_cli_includes_dataset_diagnostics_and_stderr_warning(tmp_path
     output = json.loads(completed.stdout)
     diagnostics = output["dataset_diagnostics"]
     assert diagnostics["id_base_requested"] == "auto"
-    assert diagnostics["id_base_resolved"] == "zero"
+    assert diagnostics["id_base_resolved"] == "one"
     assert diagnostics["id_normalization_diagnostics"][0]["code"] == (
         "id_base_auto_ambiguous"
     )

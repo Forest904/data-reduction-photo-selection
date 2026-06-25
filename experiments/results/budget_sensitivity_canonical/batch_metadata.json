@@ -1,0 +1,24 @@
+{
+  "batch_id": "budget_sensitivity_canonical",
+  "config_path": "experiments\\configs\\budget_sensitivity.yaml",
+  "config_sha256": "5c261e24f13fb41890489843a3df41fd6ad8d8bd00923fc7534c81f0508b375f",
+  "cpu_count": 16,
+  "created_at_utc": "2026-06-25T15:04:27.422620+00:00",
+  "dataset_diagnostics": {
+    "dataset_kind": "raw",
+    "embedding_dimension": 2048,
+    "id_base_requested": "one",
+    "id_base_resolved": "one",
+    "id_normalization_diagnostics": [],
+    "photo_count": 41620,
+    "query_count": 443,
+    "validation_warnings": []
+  },
+  "experiment_name": "budget_sensitivity",
+  "git_commit": "555e668",
+  "git_dirty": true,
+  "hardware_notes": "Windows-11-10.0.26200-SP0; cpu_count=16",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "AMD64 Family 26 Model 96 Stepping 0, AuthenticAMD",
+  "python_version": "3.12.2"
+}

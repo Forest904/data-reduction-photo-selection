@@ -59,6 +59,12 @@ def _validate_basic_shape(config: dict[str, Any]) -> None:
         int,
     ):
         raise ValueError("query_sample_size must be an integer when provided")
+    if "query_holdout_fraction" in config:
+        holdout_fraction = config["query_holdout_fraction"]
+        if not isinstance(holdout_fraction, int | float):
+            raise ValueError("query_holdout_fraction must be numeric when provided")
+        if not 0.0 < float(holdout_fraction) < 1.0:
+            raise ValueError("query_holdout_fraction must be between 0 and 1")
 
     for field_name in _SEQUENCE_FIELDS:
         if field_name in config and not isinstance(config[field_name], list):

@@ -14,6 +14,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from data_reduction import (
     DataValidationError,
     coerce_experiment_limits,
@@ -35,6 +37,9 @@ _FIELDNAMES = [
     "method",
     "dataset_size",
     "num_queries",
+    "train_query_count",
+    "eval_query_count",
+    "evaluation_scope",
     "sample_size_requested",
     "budget",
     "seed",
@@ -176,16 +181,21 @@ def _run_task(
             query_sample_size=config.get("query_sample_size"),
             sample_strategy=config.get("sample_strategy", "query_active"),
         )
+        train_queries, eval_queries, split_diagnostics = _split_train_eval_queries(
+            sampled.queries,
+            holdout_fraction=config.get("query_holdout_fraction"),
+            seed=task.seed,
+        )
         result = select_experiment_method(
             task.method,
             sampled.photos,
-            sampled.queries,
+            train_queries,
             budget=task.budget,
             seed=task.seed,
             limits=limits,
         )
         eval_metrics = (
-            evaluate_selection_metrics(sampled.photos, sampled.queries, result.selected_ids)
+            evaluate_selection_metrics(sampled.photos, eval_queries, result.selected_ids)
             if result.status == "success"
             else {
                 "cosine_proxy_utility_eval": None,
@@ -199,6 +209,7 @@ def _run_task(
             "experiment_id": experiment_id,
             "task": task.__dict__,
             "sample": sampled.diagnostics,
+            "query_split": split_diagnostics,
             "result": result.to_json_dict(),
             "selected_original_ids": selected_original_ids,
             "cross_method_metrics": eval_metrics,
@@ -207,6 +218,9 @@ def _run_task(
         row.update(
             {
                 "method": result.method or task.method,
+                "train_query_count": len(train_queries),
+                "eval_query_count": len(eval_queries),
+                "evaluation_scope": split_diagnostics["evaluation_scope"],
                 "utility_metric": result.utility_metric,
                 "utility": result.utility,
                 "cosine_proxy_utility_eval": eval_metrics["cosine_proxy_utility_eval"],
@@ -237,6 +251,9 @@ def _run_task(
         row.update(
             {
                 "method": task.method,
+                "train_query_count": None,
+                "eval_query_count": None,
+                "evaluation_scope": "error",
                 "utility_metric": None,
                 "utility": None,
                 "cosine_proxy_utility_eval": None,
@@ -266,6 +283,9 @@ def _base_row(experiment_id: str, task, sampled, metadata: dict[str, Any]) -> di
         "method": task.method,
         "dataset_size": int(sampled.photos.shape[0]),
         "num_queries": len(sampled.queries),
+        "train_query_count": len(sampled.queries),
+        "eval_query_count": len(sampled.queries),
+        "evaluation_scope": "train",
         "sample_size_requested": task.sample_size,
         "budget": task.budget,
         "seed": task.seed,
@@ -286,6 +306,52 @@ def _base_row(experiment_id: str, task, sampled, metadata: dict[str, Any]) -> di
         "python_version": metadata["python_version"],
         "hardware_notes": metadata["hardware_notes"],
     }
+
+
+def _split_train_eval_queries(
+    queries,
+    holdout_fraction: float | None,
+    seed: int,
+):
+    query_rows = tuple(queries)
+    if holdout_fraction is None:
+        return (
+            query_rows,
+            query_rows,
+            {
+                "evaluation_scope": "train",
+                "query_holdout_fraction": None,
+                "train_query_count": len(query_rows),
+                "eval_query_count": len(query_rows),
+                "eval_query_indexes": [],
+            },
+        )
+
+    if len(query_rows) < 2:
+        raise ValueError("query holdout requires at least two projected query rows")
+
+    fraction = float(holdout_fraction)
+    eval_count = max(1, int(round(len(query_rows) * fraction)))
+    eval_count = min(eval_count, len(query_rows) - 1)
+    rng = np.random.default_rng(seed)
+    eval_indexes = set(rng.choice(len(query_rows), size=eval_count, replace=False))
+    train_queries = tuple(
+        query for index, query in enumerate(query_rows) if index not in eval_indexes
+    )
+    eval_queries = tuple(
+        query for index, query in enumerate(query_rows) if index in eval_indexes
+    )
+    return (
+        train_queries,
+        eval_queries,
+        {
+            "evaluation_scope": "holdout",
+            "query_holdout_fraction": fraction,
+            "train_query_count": len(train_queries),
+            "eval_query_count": len(eval_queries),
+            "eval_query_indexes": sorted(int(index) for index in eval_indexes),
+        },
+    )
 
 
 def _batch_metadata(

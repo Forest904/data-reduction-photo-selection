@@ -1,0 +1,117 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": 0.6317960213494729,
+    "jaccard_precision_utility_eval": 0.2222222222222222
+  },
+  "experiment_id": "synthetic_canonical_0011",
+  "query_split": {
+    "eval_query_count": 18,
+    "eval_query_indexes": [],
+    "evaluation_scope": "train",
+    "query_holdout_fraction": null,
+    "train_query_count": 18
+  },
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "effective_budget": 3,
+      "nonzero_score_count": 24,
+      "query_count": 18,
+      "score_formula": "mean_query_membership_mass",
+      "score_formula_detail": "each query contributes 1 / |q(D)| to each returned photo",
+      "score_summary": {
+        "max": 0.08333333333333333,
+        "mean": 0.041666666666666664,
+        "min": 0.013888888888888888,
+        "nonzero_count": 24
+      },
+      "selected_scores": {
+        "13": 0.08333333333333333,
+        "2": 0.06944444444444445,
+        "23": 0.06944444444444445
+      },
+      "tie_breaking": "descending score, then lower photo ID"
+    },
+    "diagnostics_path": null,
+    "message": "",
+    "method": "B",
+    "peak_memory_mb": 0.00865936279296875,
+    "runtime_seconds": 0.00044890004210174084,
+    "selected_ids": [
+      13,
+      2,
+      23
+    ],
+    "status": "success",
+    "utility": 0.2222222222222222,
+    "utility_metric": "jaccard_precision_utility"
+  },
+  "sample": {
+    "dropped_query_count": 0,
+    "dropped_query_indexes": [],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 24,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "sampled_photo_count": 24,
+    "sampled_query_count": 18
+  },
+  "selected_original_ids": [
+    13,
+    2,
+    23
+  ],
+  "task": {
+    "budget": 3,
+    "method": "B",
+    "sample_size": 24,
+    "seed": 0
+  }
+}

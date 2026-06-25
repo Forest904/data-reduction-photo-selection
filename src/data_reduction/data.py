@@ -351,10 +351,10 @@ def _resolve_id_base(
         diagnostics.append(
             ValidationIssue(
                 "id_base_auto_ambiguous",
-                "Query IDs fit zero-based and one-based ranges; defaulted to zero.",
+                "Query IDs fit zero-based and one-based ranges; defaulted to one.",
             )
         )
-        return "zero", diagnostics
+        return "one", diagnostics
 
     diagnostics.append(
         ValidationIssue(

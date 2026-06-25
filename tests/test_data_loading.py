@@ -36,15 +36,15 @@ def test_load_queries_csv_parses_one_based_ids():
     assert queries.id_base_resolved == "one"
 
 
-def test_auto_id_base_ambiguous_defaults_to_zero_with_diagnostic():
+def test_auto_id_base_ambiguous_defaults_to_one_with_diagnostic():
     queries = load_queries_csv(
         FIXTURES / "queries_auto_ambiguous.csv",
         num_photos=4,
         id_base="auto",
     )
 
-    assert queries.id_base_resolved == "zero"
-    assert queries.queries == ((1, 2), (2, 3))
+    assert queries.id_base_resolved == "one"
+    assert queries.queries == ((0, 1), (1, 2))
     assert [issue.code for issue in queries.diagnostics] == [
         "id_base_auto_ambiguous"
     ]

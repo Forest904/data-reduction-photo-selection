@@ -2,7 +2,7 @@ experiment_name: budget_sensitivity
 dataset_kind: raw
 photos_path: data/raw/photos.csv
 queries_path: data/raw/queries.csv
-id_base: auto
+id_base: one
 methods: [B, D]
 sample_sizes: [10000]
 budgets: [1, 3, 5, 10, 25]

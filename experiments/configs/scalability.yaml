@@ -2,7 +2,7 @@ experiment_name: scalability
 dataset_kind: raw
 photos_path: data/raw/photos.csv
 queries_path: data/raw/queries.csv
-id_base: auto
+id_base: one
 methods: [B, D]
 sample_sizes: [1000, 5000, 10000, 20000, 41620]
 budgets: [3]

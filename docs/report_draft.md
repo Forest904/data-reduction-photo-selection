@@ -35,7 +35,7 @@ S(q(D), D') = (1 / |q(D)|) * sum_{d in q(D)} max_{s in D'} cosine(d, s).
 
 Method B also uses the assignment's Jaccard/precision-style query membership view through IndepDF scores. The implementation records both cosine-proxy utility and Jaccard/precision utility for cross-method comparison.
 
-The data-loading layer normalizes query photo identifiers once, validates bounds and malformed rows, deduplicates per-query IDs, and reports diagnostics. On the local private dataset, `id_base=auto` is ambiguous because query IDs fit both zero-based and one-based ranges, so the loader defaults to zero-based IDs and records `id_base_auto_ambiguous`.
+The data-loading layer normalizes query photo identifiers once, validates bounds and malformed rows, deduplicates per-query IDs, and reports diagnostics. The final raw-data experiments use one-based query IDs to match the assignment's line-number convention.
 
 ## 3. Methodology
 
@@ -61,7 +61,7 @@ Method B is very fast and memory efficient because it only needs to count query 
 
 Method C treats each photo as a player in a cooperative game and computes its exact Shapley value under the cosine-proxy utility function. It then selects the top-ranked photos, again using deterministic lower-ID tie-breaking.
 
-This method gives a principled game-theoretic notion of individual contribution because it averages marginal utility over coalitions. However, exact Shapley computation is exponential in the number of photos. The final evidence focuses on `B=3` tiny sampled datasets. The assignment notes that `B=4` can be tried with sufficient computational power, but this final project does not rely on a `B=4` evidence run because exact Shapley is guarded and the completed report configurations emphasize feasible, reproducible `B=3` comparisons.
+This method gives a principled game-theoretic notion of individual contribution because it averages marginal utility over coalitions. However, exact Shapley computation is exponential in the number of photos. The final evidence runs exact Shapley on tiny sampled datasets for `B=3` and `B=4`; full-data Shapley remains guarded.
 
 ### 3.4 Method D: Query-Aware Greedy Facility Location
 
@@ -97,7 +97,7 @@ The final evidence batches are:
 | Batch | Role | Result |
 | --- | --- | --- |
 | `synthetic_20260609T115535Z` | Synthetic sanity checks | 22 success rows, 2 expected Shapley skips |
-| `small_exact_comparison_20260609T115600Z` | A-D exact-scale comparison | 48 success rows |
+| `small_exact_comparison_canonical` | A-D exact-scale comparison | 96 success rows |
 | `scalability_20260609T115625Z` | B/D scalability | 10 success rows |
 | `budget_sensitivity_20260609T115734Z` | B/D budget sensitivity | 10 success rows |
 | `d_ablations_20260609T115928Z` | Method D ablations | 9 success rows |
@@ -119,7 +119,7 @@ Report figures:
 
 ### 4.2 Performance: Runtime and Memory
 
-The measured runtimes match the theoretical expectations. Method B is the fastest scalable method because it uses direct counting and sorting. In the scalability batch, Method B averaged about `0.017` seconds and `0.482` MB peak measured memory. Method D averaged about `11.157` seconds and `305.160` MB because it computes repeated similarity coverage, but it remained feasible on the full dataset through chunking.
+The measured runtimes match the theoretical expectations. Method B is the fastest scalable method because it uses direct counting and sorting. In the scalability batch, Method B averaged about `0.010` seconds and `0.482` MB peak measured memory. Method D averaged about `7.290` seconds and `305.160` MB because it computes repeated similarity coverage, but it remained feasible on the full dataset through chunking.
 
 On the small exact comparison, the average runtimes were:
 
@@ -143,9 +143,9 @@ On the small exact comparison, Methods A and D were nearly tied under cosine-pro
 | C | 0.603341 | 0.466651 |
 | D | 0.608343 | 0.466651 |
 
-On larger scalable runs, Method D achieved stronger cosine-proxy utility than Method B. In the scalability batch, Method B averaged `0.264267` cosine-proxy utility, while Method D averaged `0.345876`. In the budget-sensitivity batch, Method B averaged `0.290302`, while Method D averaged `0.367031`.
+On larger scalable runs, Method D achieved stronger cosine-proxy utility than Method B. In the scalability batch, Method B averaged `0.293034` cosine-proxy utility, while Method D averaged `0.366595`. In the budget-sensitivity batch, Method B averaged `0.315245`, while Method D averaged `0.391628`.
 
-The Method D ablation batch supports the combined design. Full Method D averaged `0.396579` cosine-proxy utility, coverage-only averaged `0.389474`, and frequency-only averaged `0.327567`. Frequency-only had higher Jaccard/precision utility but lower embedding coverage, which is consistent with its popularity-only behavior.
+The Method D ablation batch supports the combined design. Full Method D averaged `0.422695` cosine-proxy utility, coverage-only averaged `0.421382`, and frequency-only averaged `0.352703`. Frequency-only had higher Jaccard/precision utility but lower embedding coverage, which is consistent with its popularity-only behavior.
 
 ## 5. Discussion and Comparison
 

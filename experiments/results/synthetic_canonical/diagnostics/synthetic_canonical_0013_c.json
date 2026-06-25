@@ -1,0 +1,107 @@
+{
+  "cross_method_metrics": {
+    "cosine_proxy_utility_eval": 0.5746962583153908,
+    "jaccard_precision_utility_eval": 0.5833333333333334
+  },
+  "experiment_id": "synthetic_canonical_0013",
+  "query_split": {
+    "eval_query_count": 12,
+    "eval_query_indexes": [],
+    "evaluation_scope": "train",
+    "query_holdout_fraction": null,
+    "train_query_count": 12
+  },
+  "result": {
+    "diagnostics": {
+      "budget": 3,
+      "coalition_count": 64,
+      "effective_budget": 3,
+      "max_shapley_coalitions": 4096,
+      "max_shapley_photos": 12,
+      "num_photos": 6,
+      "selected_shapley_values": {
+        "0": 0.15769885087068697,
+        "1": 0.2517934633572687,
+        "4": 0.16277557296881476
+      },
+      "shapley_summary": {
+        "max": 0.2517934633572687,
+        "mean": 0.16666666666666663,
+        "min": 0.1415957927548916,
+        "nonzero_count": 6
+      },
+      "shapley_values": [
+        0.15769885087068697,
+        0.2517934633572687,
+        0.14317991048645692,
+        0.14295640956188096,
+        0.16277557296881476,
+        0.1415957927548916
+      ]
+    },
+    "diagnostics_path": null,
+    "message": "",
+    "method": "C",
+    "peak_memory_mb": 0.01267242431640625,
+    "runtime_seconds": 0.028995600063353777,
+    "selected_ids": [
+      1,
+      4,
+      0
+    ],
+    "status": "success",
+    "utility": 0.5746962583153908,
+    "utility_metric": "cosine_proxy_utility"
+  },
+  "sample": {
+    "dropped_query_count": 6,
+    "dropped_query_indexes": [
+      5,
+      6,
+      11,
+      15,
+      16,
+      17
+    ],
+    "original_photo_count": 24,
+    "original_query_count": 18,
+    "original_query_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14
+    ],
+    "query_sample_size_requested": null,
+    "sample_size_requested": 6,
+    "sample_strategy": "query_active",
+    "sampled_original_photo_ids": [
+      0,
+      5,
+      7,
+      10,
+      12,
+      16
+    ],
+    "sampled_photo_count": 6,
+    "sampled_query_count": 12
+  },
+  "selected_original_ids": [
+    5,
+    12,
+    0
+  ],
+  "task": {
+    "budget": 3,
+    "method": "C",
+    "sample_size": 6,
+    "seed": 0
+  }
+}

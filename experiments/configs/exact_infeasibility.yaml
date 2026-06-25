@@ -2,10 +2,10 @@ experiment_name: exact_infeasibility
 dataset_kind: raw
 photos_path: data/raw/photos.csv
 queries_path: data/raw/queries.csv
-id_base: auto
+id_base: one
 methods: [A, C]
 sample_sizes: [41620]
-budgets: [3]
+budgets: [3, 4]
 seeds: [0]
 sample_strategy: query_active
 include_full_dataset: true

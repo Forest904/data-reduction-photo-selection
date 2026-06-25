@@ -76,7 +76,7 @@ data/raw/queries.csv
 Validate data, run quality checks, and regenerate figures:
 
 ```bash
-uv run python scripts/validate_data.py
+uv run python scripts/validate_data.py --id-base one
 uv run pytest
 uv run ruff check .
 uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures
@@ -90,6 +90,7 @@ uv run python scripts/run_experiments.py --config experiments/configs/small.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/scalability.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/budget_sensitivity.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/d_ablations.yaml
+uv run python scripts/run_experiments.py --config experiments/configs/query_holdout.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/exact_infeasibility.yaml
 ```
 
@@ -111,7 +112,7 @@ Saved result CSVs and diagnostics live under `experiments/results/`. Generated r
 - `scalability.png`
 - `budget_sensitivity.png`
 
-Latest report evidence batches are saved under `experiments/results/`, including synthetic smoke runs, small exact comparisons, scalability, budget sensitivity, Method D ablations, and exact-method infeasibility checks. The local private dataset summary is 41,620 photos, 2,048 embedding dimensions, and 443 query rows.
+Latest report evidence batches are saved under `experiments/results/`, including synthetic smoke runs, small exact comparisons, scalability, budget sensitivity, Method D ablations, query-holdout robustness, and exact-method infeasibility checks. The local private dataset summary is 41,620 photos, 2,048 embedding dimensions, and 443 query rows. Raw-data experiments use one-based query IDs to match the assignment's line-number convention.
 
 ## Final Deliverables
 
