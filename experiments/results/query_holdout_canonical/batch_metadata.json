@@ -3,7 +3,7 @@
   "config_path": "experiments\\configs\\query_holdout.yaml",
   "config_sha256": "6b4e05e4f3ddd7f702bc33bfe01e37d02bef5095f2cded705ba7d3a3c0c5c903",
   "cpu_count": 16,
-  "created_at_utc": "2026-06-25T15:08:02.920996+00:00",
+  "created_at_utc": "2026-06-26T12:43:09.467764+00:00",
   "dataset_diagnostics": {
     "dataset_kind": "raw",
     "embedding_dimension": 2048,
@@ -15,8 +15,8 @@
     "validation_warnings": []
   },
   "experiment_name": "query_holdout",
-  "git_commit": "555e668",
-  "git_dirty": true,
+  "git_commit": "71938c3",
+  "git_dirty": false,
   "hardware_notes": "Windows-11-10.0.26200-SP0; cpu_count=16",
   "platform": "Windows-11-10.0.26200-SP0",
   "processor": "AMD64 Family 26 Model 96 Stepping 0, AuthenticAMD",
