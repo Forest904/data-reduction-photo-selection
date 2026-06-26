@@ -44,8 +44,8 @@
     "diagnostics_path": null,
     "message": "",
     "method": "D",
-    "peak_memory_mb": 46.947041511535645,
-    "runtime_seconds": 0.1327765000751242,
+    "peak_memory_mb": 46.946998596191406,
+    "runtime_seconds": 0.22857669997029006,
     "selected_ids": [
       385,
       252,
