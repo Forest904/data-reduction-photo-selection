@@ -10,11 +10,8 @@ Each photo is represented by an embedding vector in `photos.csv`. Historical sea
 ## Project Docs
 
 - [AGENT.md](AGENT.md): compact guidance for future coding agents working in this repo.
-- [Data_Reduction_Lecture_Summary_and_Full_Assignment.md](Data_Reduction_Lecture_Summary_and_Full_Assignment.md): lecture summary and assignment transcription used as project source material.
-- [docs/report_draft.md](docs/report_draft.md): Markdown-first ACM report draft for transfer into Overleaf.
-- [docs/report/report.tex](docs/report/report.tex): polished ACM-style LaTeX report source.
-- [output/pdf/data_reduction_report.pdf](output/pdf/data_reduction_report.pdf): compiled final 10-page PDF report.
-- [docs/submission_email.md](docs/submission_email.md): final submission email draft with link placeholders.
+- [docs/report/report.tex](docs/report/report.tex): polished LaTeX report source.
+- [output/pdf/data_reduction_report.pdf](output/pdf/data_reduction_report.pdf): compiled final PDF report.
 
 ## Methods
 
@@ -117,9 +114,8 @@ Latest report evidence batches are saved under `experiments/results/`, including
 ## Final Deliverables
 
 - GitHub repository containing implementations, tests, experiment scripts, saved results, figures, and reproducibility notes.
-- ACM-style Overleaf report describing Method D and comparing Methods A-D.
+- PDF report describing Method D and comparing Methods A-D.
 - Generated figures and tables covering utility, runtime, memory, scalability, and complexity.
-- Submission email with full name, matricola, GitHub link, and Overleaf link.
 
 ## References
 
