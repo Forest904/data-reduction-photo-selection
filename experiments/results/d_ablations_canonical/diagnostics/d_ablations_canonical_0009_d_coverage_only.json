@@ -58,7 +58,7 @@
     "message": "",
     "method": "D_coverage_only",
     "peak_memory_mb": 390.9308166503906,
-    "runtime_seconds": 39.76384229992982,
+    "runtime_seconds": 56.86354309995659,
     "selected_ids": [
       7735,
       2723,
