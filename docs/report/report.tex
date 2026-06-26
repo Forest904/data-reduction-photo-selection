@@ -165,7 +165,7 @@ The smallest assignment budget is $\budget=3$. The full-data Method D run is the
     \toprule
     Method & Selected photos & Cosine proxy & Runtime (s) & Peak MB \\
     \midrule
-    D & normalized: 5974, 39809, 24228; line IDs: 5975, 39810, 24229 & 0.369236 & 20.478 & 427.795 \\
+    D & normalized: 5974, 39809, 24228; line IDs: 5975, 39810, 24229 & 0.369236 & 31.172 & 427.795 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -201,7 +201,7 @@ On the full dataset, Method A would need to evaluate 12,014,997,156,340 subsets 
 On query-active samples small enough for exact search, Method D nearly matches Method A under the cosine proxy. For $\budget=3$, average cosine utility is 0.612920 for A and 0.612436 for D. For $\budget=4$, it is 0.696715 for A and 0.696319 for D. This is evidence that the greedy coverage objective recovers the exact coverage structure on feasible instances.
 
 \textbf{Scalability and quality.}
-Method B is consistently fastest and lightest. On the full dataset at $\budget=3$, B runs in 0.013 seconds with 1.278 MB peak measured memory, but its cosine-proxy utility is 0.283321. Method D runs in 20.478 seconds with 427.795 MB peak measured memory and reaches 0.369236 cosine-proxy utility. Averaged over the scalability batch, B reaches 0.293034 while D reaches 0.366595.
+Method B is consistently fastest and lightest. On the full dataset at $\budget=3$, B runs in 0.022 seconds with 1.278 MB peak measured memory, but its cosine-proxy utility is 0.283321. Method D runs in 31.172 seconds with 427.795 MB peak measured memory and reaches 0.369236 cosine-proxy utility. Averaged over the scalability batch, B reaches 0.293034 while D reaches 0.366595.
 
 \begin{figure}[!htbp]
   \centering
@@ -219,16 +219,16 @@ Method B is consistently fastest and lightest. On the full dataset at $\budget=3
     \toprule
     Method & Photos & Cosine proxy & Runtime (s) \\
     \midrule
-    B & 1,000 & 0.302 & 0.007 \\
-    B & 5,000 & 0.311 & 0.009 \\
-    B & 10,000 & 0.286 & 0.011 \\
-    B & 20,000 & 0.283 & 0.012 \\
-    B & 41,620 & 0.283 & 0.013 \\
-    D & 1,000 & 0.359 & 0.133 \\
-    D & 5,000 & 0.368 & 1.322 \\
-    D & 10,000 & 0.366 & 4.510 \\
-    D & 20,000 & 0.371 & 10.010 \\
-    D & 41,620 & 0.369 & 20.478 \\
+    B & 1,000 & 0.302 & 0.012 \\
+    B & 5,000 & 0.311 & 0.015 \\
+    B & 10,000 & 0.286 & 0.017 \\
+    B & 20,000 & 0.283 & 0.021 \\
+    B & 41,620 & 0.283 & 0.022 \\
+    D & 1,000 & 0.359 & 0.229 \\
+    D & 5,000 & 0.368 & 2.205 \\
+    D & 10,000 & 0.366 & 7.240 \\
+    D & 20,000 & 0.371 & 15.178 \\
+    D & 41,620 & 0.369 & 31.172 \\
     \bottomrule
   \end{tabular}
 \end{table}
