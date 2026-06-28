@@ -11,15 +11,23 @@ This project solves the Data Reduction Practical: given photo embeddings in `pho
 - Prefer vectorized NumPy for similarity and utility work.
 - Keep exact Method A and exact Method C restricted to tiny datasets with guardrails.
 - Tie-break deterministically, preferably by lower photo ID.
-- Save figures from result files; do not manually edit result data.
-- If docs conflict, follow the implemented code, tests, saved experiment artifacts, and final report; update README for entrypoint-level workflow changes.
+- Treat code, tests, experiment configs, canonical result batches, and the
+  canonical LaTeX report as the documentation sources of truth.
+- Keep `README.md`, `data/README.md`, `docs/report_draft.md`, and
+  `docs/report/report.tex` consistent when workflows, data rules, methods, or
+  evidence change.
+- After report or figure changes, refresh `output/overleaf/` and rebuild
+  `output/pdf/data_reduction_report.pdf`.
+- Save figures from result files; do not manually edit result data or generated
+  figure content.
 
 ## Method Reminders
 
-- A: exhaustive cosine baseline over feasible small combinations.
+- A: exhaustive cosine-proxy baseline over feasible small combinations.
 - B: IndepDF/Jaccard-style score, `E[I_q(d) / |q(D)|]`, then top `B`.
 - C: Shapley values, exact for tiny assignment setting; approximation is stretch.
-- D: query-aware greedy facility-location with query-frequency weights and cosine coverage.
+- D: query-mass-weighted greedy facility location with clipped cosine coverage
+  and memory-bounded candidate chunks.
 
 ## Quality Commands
 
@@ -27,4 +35,5 @@ This project solves the Data Reduction Practical: given photo embeddings in `pho
 uv run pytest
 uv run ruff check .
 uv run ruff format .
+uv run python scripts/generate_figures.py --results experiments/results --output experiments/figures
 ```

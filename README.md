@@ -10,8 +10,11 @@ Each photo is represented by an embedding vector in `photos.csv`. Historical sea
 ## Project Docs
 
 - [AGENT.md](AGENT.md): compact guidance for future coding agents working in this repo.
+- [data/README.md](data/README.md): private dataset layout and validation contract.
+- [docs/report_draft.md](docs/report_draft.md): Markdown companion to the final report.
 - [docs/report/report.tex](docs/report/report.tex): polished LaTeX report source.
 - [output/pdf/data_reduction_report.pdf](output/pdf/data_reduction_report.pdf): compiled final PDF report.
+- [output/overleaf/README.txt](output/overleaf/README.txt): self-contained Overleaf export instructions.
 
 ## Methods
 
@@ -19,12 +22,16 @@ The project implements and compares four required selection methods:
 
 | Method | Summary | Intended role |
 | --- | --- | --- |
-| A | Exhaustive cosine-based subset selection | Exact baseline for tiny datasets |
-| B | IndepDF with Jaccard/precision-style query scoring | Scalable query-log baseline |
-| C | Exact Shapley-value-based photo ranking | Principled importance baseline for tiny datasets |
-| D | Query-aware greedy facility location with cosine coverage | Proposed scalable method |
+| A | Exhaustive search maximizing cosine-proxy utility | Exact baseline for tiny datasets |
+| B | IndepDF ranking by normalized query-membership mass | Scalable query-log baseline |
+| C | Exact Shapley-value ranking under cosine-proxy utility | Principled importance baseline for tiny datasets |
+| D | Query-mass-weighted greedy facility location with clipped cosine coverage | Proposed scalable method |
 
-Method D is the original project proposal. It weights photos by query frequency and greedily selects representatives that maximize clipped cosine coverage, balancing popularity and diversity.
+All methods cap the effective budget at the dataset size. Ranking and greedy ties
+are resolved by lower photo ID. Methods A and C return documented `skipped`
+results when their configurable exact-computation guardrails are exceeded.
+Method D evaluates candidates in memory-bounded chunks rather than materializing
+a full all-pairs similarity matrix.
 
 ## Repository Shape
 
@@ -53,7 +60,12 @@ data/
     queries.csv
 ```
 
-`photos.csv` contains one embedding vector per row. `queries.csv` contains one historical query result set per row. Photo ID normalization and validation rules are implemented in `src/data_reduction/data.py` and summarized in this README and the final report.
+Both files are headerless CSVs. `photos.csv` contains one numeric embedding
+vector per row. Each row of `queries.csv` contains the photo IDs returned by one
+historical query. Raw-data commands default to one-based query IDs, matching the
+assignment's line-number convention, and normalize them to zero-based internal
+IDs during loading. Validation rejects malformed, missing, duplicate, empty, and
+out-of-range data. See [data/README.md](data/README.md) for the concise contract.
 
 ## Clean Clone Instructions
 
@@ -83,6 +95,7 @@ Optional experiment commands:
 
 ```bash
 uv run python scripts/run_method.py --method D --budget 3
+uv run python scripts/run_experiments.py --config experiments/configs/synthetic.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/small.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/scalability.yaml
 uv run python scripts/run_experiments.py --config experiments/configs/budget_sensitivity.yaml
@@ -108,14 +121,38 @@ Saved result CSVs and diagnostics live under `experiments/results/`. Generated r
 - `memory.png`
 - `scalability.png`
 - `budget_sensitivity.png`
+- `holdout_utility.png`
 
-Latest report evidence batches are saved under `experiments/results/`, including synthetic smoke runs, small exact comparisons, scalability, budget sensitivity, Method D ablations, query-holdout robustness, and exact-method infeasibility checks. The local private dataset summary is 41,620 photos, 2,048 embedding dimensions, and 443 query rows. Raw-data experiments use one-based query IDs to match the assignment's line-number convention.
+The report and figure generator use the seven canonical batches under
+`experiments/results/`:
+
+- `synthetic_canonical`
+- `small_exact_comparison_canonical`
+- `scalability_canonical`
+- `budget_sensitivity_canonical`
+- `d_ablations_canonical`
+- `query_holdout_canonical`
+- `exact_infeasibility_canonical`
+
+The local private dataset summary is 41,620 photos, 2,048 embedding dimensions,
+and 443 query rows. The full-data Method D result for budget 3 selects normalized
+IDs `5974`, `39809`, and `24228`, corresponding to one-based assignment line IDs
+`5975`, `39810`, and `24229`.
+
+## Report Outputs
+
+`docs/report/report.tex` is the canonical report source and reads figures from
+`experiments/figures/`. The committed Overleaf export under `output/overleaf/`
+contains the same report text with an export-local `figures/` path. When report
+text or figures change, refresh both the Overleaf export and
+`output/pdf/data_reduction_report.pdf`.
 
 ## Final Deliverables
 
 - GitHub repository containing implementations, tests, experiment scripts, saved results, figures, and reproducibility notes.
 - PDF report describing Method D and comparing Methods A-D.
-- Generated figures and tables covering utility, runtime, memory, scalability, and complexity.
+- Generated figures and tables covering utility, runtime, memory, scalability,
+  budget sensitivity, query holdout, and complexity.
 
 ## References
 

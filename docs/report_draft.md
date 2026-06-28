@@ -3,7 +3,7 @@
 **Author:** Luca Foresti  
 **Matricola:** 565562  
 **Course:** Data Reduction, Roma Tre  
-**Draft target:** ACM SIG proceedings-style Overleaf report
+**Role:** Markdown companion to the canonical ACM-style LaTeX report
 
 ## Abstract
 
@@ -35,11 +35,14 @@ S(q(D), D') = (1 / |q(D)|) * sum_{d in q(D)} max_{s in D'} cosine(d, s).
 
 Method B also uses the assignment's Jaccard/precision-style query membership view through IndepDF scores. The implementation records both cosine-proxy utility and Jaccard/precision utility for cross-method comparison.
 
-The data-loading layer normalizes query photo identifiers once, validates bounds and malformed rows, deduplicates per-query IDs, and reports diagnostics. The final raw-data experiments use one-based query IDs to match the assignment's line-number convention.
+The data-loading layer normalizes query photo identifiers once, validates bounds
+and malformed rows, rejects duplicate IDs within a query, and reports
+diagnostics. The final raw-data experiments use one-based query IDs to match the
+assignment's line-number convention.
 
 ## 3. Methodology
 
-### 3.1 Method A: Stochastic Exact Cosine Search
+### 3.1 Method A: Exhaustive Cosine Search
 
 Method A directly optimizes the cosine-proxy objective by enumerating all candidate subsets of size `B` and returning the subset with maximum utility. In this project, it is implemented as an exact exhaustive baseline for tiny sampled datasets, especially the assignment-literal case with `B=3`.
 
@@ -96,12 +99,13 @@ The final evidence batches are:
 
 | Batch | Role | Result |
 | --- | --- | --- |
-| `synthetic_20260609T115535Z` | Synthetic sanity checks | 22 success rows, 2 expected Shapley skips |
+| `synthetic_canonical` | Synthetic sanity checks | 22 success rows, 2 expected Shapley skips |
 | `small_exact_comparison_canonical` | A-D exact-scale comparison | 96 success rows |
-| `scalability_20260609T115625Z` | B/D scalability | 10 success rows |
-| `budget_sensitivity_20260609T115734Z` | B/D budget sensitivity | 10 success rows |
-| `d_ablations_20260609T115928Z` | Method D ablations | 9 success rows |
-| `exact_infeasibility_20260609T120233Z` | Full-data exact skip documentation | 2 expected skips |
+| `scalability_canonical` | B/D scalability | 10 success rows |
+| `budget_sensitivity_canonical` | B/D budget sensitivity | 10 success rows |
+| `d_ablations_canonical` | Method D ablations | 9 success rows |
+| `query_holdout_canonical` | Held-out query robustness | 12 success rows |
+| `exact_infeasibility_canonical` | Full-data exact skip documentation | 4 expected skips |
 
 The recorded hardware environment is Python 3.12.2 on Windows 11, with 16 CPUs and an AMD64 processor. The figure artifacts are generated from saved CSV results using:
 
@@ -116,19 +120,25 @@ Report figures:
 - `../experiments/figures/memory.png`
 - `../experiments/figures/scalability.png`
 - `../experiments/figures/budget_sensitivity.png`
+- `../experiments/figures/holdout_utility.png`
 
 ### 4.2 Performance: Runtime and Memory
 
-The measured runtimes match the theoretical expectations. Method B is the fastest scalable method because it uses direct counting and sorting. In the scalability batch, Method B averaged about `0.010` seconds and `0.482` MB peak measured memory. Method D averaged about `7.290` seconds and `305.160` MB because it computes repeated similarity coverage, but it remained feasible on the full dataset through chunking.
+The measured runtimes match the theoretical expectations. Method B is the
+fastest scalable method because it uses direct counting and sorting. In the
+scalability batch, Method B averaged about `0.017` seconds and `0.482` MB peak
+measured memory. Method D averaged about `11.205` seconds and `305.160` MB
+because it computes repeated similarity coverage, but it remained feasible on
+the full dataset through chunking.
 
 On the small exact comparison, the average runtimes were:
 
 | Method | Runtime seconds | Peak memory MB |
 | --- | ---: | ---: |
-| A | 0.075913 | 0.189691 |
-| B | 0.000605 | 0.008263 |
-| C | 1.201798 | 0.373998 |
-| D | 0.002293 | 0.440657 |
+| A | 0.110159 | 0.197561 |
+| B | 0.000589 | 0.008232 |
+| C | 1.167408 | 0.340381 |
+| D | 0.002551 | 0.440582 |
 
 Full-data exact Method A and exact Method C were skipped by design. Method A exceeds exhaustive-search limits, and Method C exceeds exact Shapley limits. These skipped results are part of the evidence, not failures.
 
@@ -138,14 +148,20 @@ On the small exact comparison, Methods A and D were nearly tied under cosine-pro
 
 | Method | Mean cosine-proxy utility | Mean Jaccard/precision utility |
 | --- | ---: | ---: |
-| A | 0.608461 | 0.466651 |
-| B | 0.594386 | 0.466651 |
-| C | 0.603341 | 0.466651 |
-| D | 0.608343 | 0.466651 |
+| A | 0.654818 | 0.518673 |
+| B | 0.642168 | 0.518673 |
+| C | 0.643034 | 0.518673 |
+| D | 0.654377 | 0.518673 |
 
 On larger scalable runs, Method D achieved stronger cosine-proxy utility than Method B. In the scalability batch, Method B averaged `0.293034` cosine-proxy utility, while Method D averaged `0.366595`. In the budget-sensitivity batch, Method B averaged `0.315245`, while Method D averaged `0.391628`.
 
 The Method D ablation batch supports the combined design. Full Method D averaged `0.422695` cosine-proxy utility, coverage-only averaged `0.421382`, and frequency-only averaged `0.352703`. Frequency-only had higher Jaccard/precision utility but lower embedding coverage, which is consistent with its popularity-only behavior.
+
+The query-holdout batch trains on 75% of projected queries and evaluates on the
+remaining 25%. Averaged over budgets and seeds, Method D reaches `0.399460`
+held-out cosine-proxy utility, compared with `0.295733` for Method B. Because the
+query log has no timestamps, this is a deterministic random holdout rather than
+a temporal evaluation.
 
 ## 5. Discussion and Comparison
 
